@@ -1,0 +1,55 @@
+version: "3.8"
+x-namada: &namada-common
+  restart: unless-stopped
+  build:
+    args:
+      - NAMADA_TAG=${NAMADA_TAG}
+      - BUILD_WASM=true
+  image: arashidos/namada:${NAMADA_TAG}
+  entrypoint: ["sh", "/docker-entrypoint-scripts.d/start-node.sh"]
+
+services:
+  namada-1:
+    <<: *namada-common
+    hostname: namada-1
+    volumes:
+      - ./config/start-node.sh:/docker-entrypoint-scripts.d/start-node.sh
+      - namada-shared:/root/.namada-shared
+      - ${GENESIS_TEMPLATE:-./config/genesis_template.toml}:/genesis_template.toml
+      - ./config/make_genesis.py:/make_genesis.py
+      - namada-1_data:/root/.local/share/namada
+    environment:
+      # - CHAIN_ID=$CHAIN_ID
+      - P2P_PORT=${P2P_PORT}
+      - EXTIP=${EXTIP}
+    ports:
+      - "${P2P_PORT}:26656" # p2p
+      - "${RPC_PORT}:26657" # http rpc
+      - "${SERVE_PORT}:8123" # configs server
+
+  namada-2:
+    <<: *namada-common
+    hostname: namada-2
+    volumes:
+      - ./config/start-node.sh:/docker-entrypoint-scripts.d/start-node.sh
+      - namada-shared:/root/.namada-shared
+      - namada-2_data:/root/.local/share/namada
+    ports:
+      - "26656" # p2p
+      - "26657" # http rpc
+
+  namada-3:
+    <<: *namada-common
+    hostname: namada-3
+    volumes:
+      - ./config/start-node.sh:/docker-entrypoint-scripts.d/start-node.sh
+      - namada-shared:/root/.namada-shared
+      - namada-3_data:/root/.local/share/namada
+    ports:
+      - "26656" # p2p
+      - "26657" # http rpc
+volumes:
+  namada-1_data:
+  namada-2_data:
+  namada-3_data:
+  namada-shared:
