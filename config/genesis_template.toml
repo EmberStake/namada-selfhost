@@ -67,9 +67,6 @@ Christel = "1000000"
 Daewon = "1000000"
 Ester = "1000000"
 faucet = "922337203685400000000"
-faucet-2 = "922337203685400000000"
-faucet-3 = "922337203685400000000"
-faucet-4 = "922337203685400000000"
 "validator-1.public_key" = "1000"
 "validator-2.public_key" = "1000"
 "validator-3.public_key" = "1000"
@@ -90,9 +87,6 @@ Christel = "1000000"
 Daewon = "1000000"
 Ester = "1000000"
 faucet = "922337203685400000000"
-faucet-2 = "922337203685400000000"
-faucet-3 = "922337203685400000000"
-faucet-4 = "922337203685400000000"
 [token.BTC.parameters]
 max_reward_rate = "0.1"
 kd_gain_nom = "0.1"
@@ -110,9 +104,6 @@ Christel = "1000000"
 Daewon = "1000000"
 Ester = "1000000"
 faucet = "922337203685400000000"
-faucet-2 = "922337203685400000000"
-faucet-3 = "922337203685400000000"
-faucet-4 = "922337203685400000000"
 [token.ETH.parameters]
 max_reward_rate = "0.1"
 kd_gain_nom = "0.1"
@@ -130,9 +121,6 @@ Christel = "1000000"
 Daewon = "1000000"
 Ester = "1000000"
 faucet = "922337203685400000000"
-faucet-2 = "922337203685400000000"
-faucet-3 = "922337203685400000000"
-faucet-4 = "922337203685400000000"
 [token.DOT.parameters]
 max_reward_rate = "0.1"
 kd_gain_nom = "0.1"
@@ -150,9 +138,6 @@ Christel = "1000000"
 Daewon = "1000000"
 Ester = "1000000"
 faucet = "922337203685400000000"
-faucet-2 = "922337203685400000000"
-faucet-3 = "922337203685400000000"
-faucet-4 = "922337203685400000000"
 [token.Schnitzel.parameters]
 max_reward_rate = "0.1"
 kd_gain_nom = "0.1"
@@ -170,9 +155,6 @@ Christel = "1000000"
 Daewon = "1000000"
 Ester = "1000000"
 faucet = "922337203685400000000"
-faucet-2 = "922337203685400000000"
-faucet-3 = "922337203685400000000"
-faucet-4 = "922337203685400000000"
 [token.Apfel.parameters]
 max_reward_rate = "0.1"
 kd_gain_nom = "0.1"
@@ -191,9 +173,6 @@ Christel = "1000000"
 Daewon = "1000000"
 Ester = "1000000"
 faucet = "922337203685400000000"
-faucet-2 = "922337203685400000000"
-faucet-3 = "922337203685400000000"
-faucet-4 = "922337203685400000000"
 [token.Kartoffel.parameters]
 max_reward_rate = "0.1"
 kd_gain_nom = "0.1"
@@ -202,12 +181,6 @@ locked_ratio_target_key = "0.6667"
 
 # Some established accounts present at genesis.
 [implicit.faucet]
-
-[implicit.faucet-2]
-
-[implicit.faucet-3]
-
-[implicit.faucet-4]
 
 [established.Albert]
 vp = "vp_user"

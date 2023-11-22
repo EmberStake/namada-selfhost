@@ -47,6 +47,8 @@ if [ $(hostname) = "namada-1" ]; then
       | grep 'Derived chain ID:' \
       | awk '{print $4}')
     echo "Chain id: $CHAIN_ID"
+    echo "make a backup from setup wallet.toml file"
+    cp /root/.local/share/namada/$CHAIN_ID/setup/other/wallet.toml /root/.namada-shared/wallet-setup.toml
   fi
 
   # serve config tar over http
@@ -91,6 +93,8 @@ namada client utils join-network \
 # copy wasm to namada dir
 cp -a /wasm/*.wasm /root/.local/share/namada/$CHAIN_ID/wasm
 cp -a /wasm/checksums.json /root/.local/share/namada/$CHAIN_ID/wasm
+# add faucet keys to each validator wallet.toml , so validators can transfer tokens from faucet account
+python3 /root/.namada-shared/add-faucet-wallet.py /root/.local/share/namada/$CHAIN_ID/wallet.toml
 
 # configure namada-1 node to advertise host public ip to outside peers if provided
 EXTIP=${EXTIP:-''}

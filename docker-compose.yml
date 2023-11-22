@@ -13,6 +13,8 @@ services:
     <<: *namada-common
     hostname: namada-1
     volumes:
+      - ./config/add-faucet-wallet.py:/root/.namada-shared/add-faucet-wallet.py
+      - ./masp-params:/root/.masp-params
       - ./config/start-node.sh:/docker-entrypoint-scripts.d/start-node.sh
       - namada-shared:/root/.namada-shared
       - ${GENESIS_TEMPLATE:-./config/genesis_template.toml}:/genesis_template.toml
@@ -31,6 +33,8 @@ services:
     <<: *namada-common
     hostname: namada-2
     volumes:
+      - ./config/add-faucet-wallet.py:/root/.namada-shared/add-faucet-wallet.py
+      - ./masp-params:/root/.masp-params
       - ./config/start-node.sh:/docker-entrypoint-scripts.d/start-node.sh
       - namada-shared:/root/.namada-shared
       - namada-2_data:/root/.local/share/namada
@@ -42,6 +46,8 @@ services:
     <<: *namada-common
     hostname: namada-3
     volumes:
+      - ./masp-params:/root/.masp-params
+      - ./config/add-faucet-wallet.py:/root/.namada-shared/add-faucet-wallet.py
       - ./config/start-node.sh:/docker-entrypoint-scripts.d/start-node.sh
       - namada-shared:/root/.namada-shared
       - namada-3_data:/root/.local/share/namada
