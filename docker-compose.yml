@@ -16,7 +16,7 @@ services:
       - ./config/key-gen.exp:/scripts/key-gen.exp
       - ./config/genesis:/genesis:ro
       - ./config/make_balances.py:/scripts/make_balances.py
-#      - ./masp-params:/root/.masp-params
+      - ./masp-params:/root/.masp-params
       - ./config/start-node.sh:/docker-entrypoint-scripts.d/start-node.sh
       - namada-shared:/root/.namada-shared
       - namada-1_data:/root/.local/share/namada
@@ -34,7 +34,7 @@ services:
     hostname: namada-2
     volumes:
       - ./config/key-gen.exp:/scripts/key-gen.exp
-#      - ./masp-params:/root/.masp-params
+      - ./masp-params:/root/.masp-params
       - ./config/start-node.sh:/docker-entrypoint-scripts.d/start-node.sh
       - namada-shared:/root/.namada-shared
       - namada-2_data:/root/.local/share/namada
@@ -47,7 +47,7 @@ services:
     hostname: namada-3
     volumes:
       - ./config/key-gen.exp:/scripts/key-gen.exp
-#      - ./masp-params:/root/.masp-params
+      - ./masp-params:/root/.masp-params
       - ./config/start-node.sh:/docker-entrypoint-scripts.d/start-node.sh
       - namada-shared:/root/.namada-shared
       - namada-3_data:/root/.local/share/namada
