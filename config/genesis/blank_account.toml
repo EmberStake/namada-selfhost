@@ -1,0 +1,51 @@
+# Template for adding accounts to genesis
+# Fill in the appropriate info and sign with 'sign-genesis-tx' command
+# Then add to the transactions.toml prior generating genesis
+
+[[established_account]]
+alias = "ALIAS"
+vp = "vp_user"
+public_key = "PUBLIC_KEY"
+
+# Transfer all the account's tokens into its established account:
+[[transfer]]
+token = "NAM"
+source = "PUBLIC_KEY"
+target = "ALIAS"
+amount = "AMOUNT"
+
+[[transfer]]
+token = "BTC"
+source = "PUBLIC_KEY"
+target = "ALIAS"
+amount = "AMOUNT"
+
+[[transfer]]
+token = "ETH"
+source = "PUBLIC_KEY"
+target = "ALIAS"
+amount = "AMOUNT"
+
+[[transfer]]
+token = "DOT"
+source = "PUBLIC_KEY"
+target = "ALIAS"
+amount = "AMOUNT"
+
+[[transfer]]
+token = "Schnitzel"
+source = "PUBLIC_KEY"
+target = "ALIAS"
+amount = "AMOUNT"
+
+[[transfer]]
+token = "Apfel"
+source = "PUBLIC_KEY"
+target = "ALIAS"
+amount = "AMOUNT"
+
+[[transfer]]
+token = "Kartoffel"
+source = "PUBLIC_KEY"
+target = "ALIAS"
+amount = "AMOUNT"

@@ -13,12 +13,12 @@ services:
     <<: *namada-common
     hostname: namada-1
     volumes:
-      - ./config/add-faucet-wallet.py:/root/.namada-shared/add-faucet-wallet.py
+      - ./config/key-gen.exp:/scripts/key-gen.exp
+      - ./config/genesis:/genesis:ro
+      - ./config/make_balances.py:/scripts/make_balances.py
       - ./masp-params:/root/.masp-params
       - ./config/start-node.sh:/docker-entrypoint-scripts.d/start-node.sh
       - namada-shared:/root/.namada-shared
-      - ${GENESIS_TEMPLATE:-./config/genesis_template.toml}:/genesis_template.toml
-      - ./config/make_genesis.py:/make_genesis.py
       - namada-1_data:/root/.local/share/namada
     environment:
       # - CHAIN_ID=$CHAIN_ID
@@ -33,7 +33,7 @@ services:
     <<: *namada-common
     hostname: namada-2
     volumes:
-      - ./config/add-faucet-wallet.py:/root/.namada-shared/add-faucet-wallet.py
+      - ./config/key-gen.exp:/scripts/key-gen.exp
       - ./masp-params:/root/.masp-params
       - ./config/start-node.sh:/docker-entrypoint-scripts.d/start-node.sh
       - namada-shared:/root/.namada-shared
@@ -46,8 +46,8 @@ services:
     <<: *namada-common
     hostname: namada-3
     volumes:
+      - ./config/key-gen.exp:/scripts/key-gen.exp
       - ./masp-params:/root/.masp-params
-      - ./config/add-faucet-wallet.py:/root/.namada-shared/add-faucet-wallet.py
       - ./config/start-node.sh:/docker-entrypoint-scripts.d/start-node.sh
       - namada-shared:/root/.namada-shared
       - namada-3_data:/root/.local/share/namada

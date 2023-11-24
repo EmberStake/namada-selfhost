@@ -1,7 +1,7 @@
 # Namada Self Host
 This repository helps to quickly spin up a local version of namada blockchain with 3 validators using Docker.   
 This can be helpful for curios users and developers alike.   
-There are a [bunch of blog posts](https://example.com) with detailed instruction on how to install and work with this code
+There are a bunch of [blog posts](https://mirror.xyz/0xe4e0B45aa2b06Df651337E3519ee6ccD81511Bf0/V8GPGi3XTf1WcL0nB2oGKo1T6X1cHfzfQCpj11tuUPI) with detailed instruction on how to install and work with this code
 
 ### Requirements
 - Docker (or Docker Desktop on Windows/Mac) 
