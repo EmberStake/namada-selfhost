@@ -2,12 +2,15 @@ version: "3.8"
 x-namada: &namada-common
   restart: unless-stopped
   build:
+    dockerfile: docker/Dockerfile
+    context: .
     args:
       - NAMADA_TAG=${NAMADA_TAG}
       - BUILD_WASM=true
   image: arashidos/namada:${NAMADA_TAG}
   entrypoint: ["sh", "/docker-entrypoint-scripts.d/start-node.sh"]
-
+  networks:
+    namada:
 services:
   namada-1:
     <<: *namada-common
@@ -54,8 +57,31 @@ services:
     ports:
       - "26656" # p2p
       - "26657" # http rpc
+  interface:
+    restart: unless-stopped
+    build:
+      dockerfile: docker/namada-interface.Dockerfile
+      context: .
+    image: arashidos/namada-interface:commit-d58c0f4 #supports namada v0.27.0
+    entrypoint: [ "sh", "/docker-entrypoint-scripts.d/start-node.sh" ]
+    hostname: namada-interface
+    env_file:
+      - .env
+    networks:
+      namada:
+    volumes:
+      - ./config/namada-interface-entrypoint.sh:/docker-entrypoint-scripts.d/start-node.sh
+      - namada-shared:/root/.namada-shared
+      - namada-interface:/root/.local/share/namada
+      - ./extensions:/build
+    ports:
+      - "${INTERFACE_PORT}:3000"
 volumes:
   namada-1_data:
   namada-2_data:
   namada-3_data:
   namada-shared:
+  namada-interface:
+
+networks:
+  namada:
