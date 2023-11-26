@@ -1,32 +1,28 @@
 #FROM rust:slim-bookworm
-FROM node:lts-bookworm-slim
+FROM node:lts-bookworm
 
-RUN apt-get update && apt-get install -y \
-    curl \
-    clang \
-    pkg-config \
-    git \
-    libssl-dev \
-    protobuf-compiler \
-    libudev-dev \
-    nano \
-    jq \
-    && apt-get clean
+RUN apt-get update && \
+    apt-get install -y \
+        curl \
+        clang \
+        pkg-config \
+        git \
+        libssl-dev \
+        protobuf-compiler \
+        libudev-dev &&\
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install rustup
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-
 ENV PATH="/root/.cargo/bin:${PATH}"
+RUN rustup target add wasm32-unknown-unknown && \
+    curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+RUN  yarn global add web-ext
 
-# Add WASM target & wasm-pack
-RUN rustup target add wasm32-unknown-unknown \
-    && curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-
-# Install web-ext
-RUN yarn global add web-ext
-
-RUN git clone --branch main https://github.com/anoma/namada-interface.git
+WORKDIR /root
+RUN git clone --branch main https://github.com/anoma/namada-interface.git && \
+    cd namada-interface && \
+    git reset --hard d58c0f4
 WORKDIR namada-interface
-RUN git reset --hard d58c0f4
-RUN yarn
+#RUN yarn
 
