@@ -46,11 +46,33 @@ then you can run any commands over the blockchain. e.g. :
 ```shell
 namada --version
 ```
-
 for more information about commands, check the [official docs](https://docs.namada.net/users)
+
+# Namada Interface & Extension
+
+This stack comes with a container named `interface` which serves the [official namada-interface](https://github.com/anoma/namada-interface)
+It also builds the Namada Browser extension during the startup. The chain ID is automatically set to the local running Namada blockchain.    
+You can tweak supported environment variables through the `.env` file.    
+Building cloud take a very long time to finish, so be patient, in the meantime you can work with the CLI.    
+
+## Using the Interface
+When the container is ready you can access the Interface in your browser, the default address is http://localhost:3000/
+
+## Using The Extension
+The extension files are accessible in `extensions` directory. to install the chrome wallet extension do the following :    
+
+In Chrome, select Manage Extensions    
+Click the toggle to enable Developer Mode    
+Click Load Unpacked and point to the `extensions/chrome` in this project    
+
+**Important** The extension should be reinstalled if you rebuild your CHAIN_ID changes    
 
 # Tear Down
 To remove everything
 ```shell
 docker compose down -v
 ```
+
+# Know Issues
+- The UI does not show correct Account balances
+- Interface Docker image size is very large and it's build time takes ages
