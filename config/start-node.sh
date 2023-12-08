@@ -156,5 +156,11 @@ fi
   sed -i "s#prometheus = .*#prometheus = true#g" /root/.local/share/namada/$CHAIN_ID/config.toml
   sed -i "s#namespace = .*#namespace = \"tendermint\"#g" /root/.local/share/namada/$CHAIN_ID/config.toml
 
+
+if [ $(hostname) = "namada-1" ]; then
+rm -f /root/.namada-shared/tokens-addresses
+namadaw address find --alias nam | grep -o 'tnam[^ ]*' >> /root/.namada-shared/tokens-addresses
+namadaw address find --alias eth | grep -o 'tnam[^ ]*' >> /root/.namada-shared/tokens-addresses
+fi
 # start node
 NAMADA_LOG=info CMT_LOG_LEVEL=p2p:none,pex:error NAMADA_CMT_STDOUT=true namada node ledger run
