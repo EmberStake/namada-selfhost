@@ -1,5 +1,5 @@
-#FROM rust:slim-bookworm
 FROM node:lts-bookworm
+ARG COMMIT_TAG=d58c0f4
 
 RUN apt-get update && \
     apt-get install -y \
@@ -22,7 +22,6 @@ RUN  yarn global add web-ext
 WORKDIR /root
 RUN git clone --branch main https://github.com/anoma/namada-interface.git && \
     cd namada-interface && \
-    git reset --hard d58c0f4
+    git reset --hard ${COMMIT_TAG}
 WORKDIR namada-interface
-#RUN yarn
 

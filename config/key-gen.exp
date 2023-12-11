@@ -1,7 +1,0 @@
-#!/usr/bin/expect
-
-set ALIAS [lindex $argv 0]
-spawn namadaw key gen --pre-genesis --alias $ALIAS --unsafe-dont-encrypt
-expect "Enter BIP39 passphrase (empty for none):"
-send "\n"
-expect eof
