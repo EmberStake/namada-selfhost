@@ -62,7 +62,7 @@ services:
     build:
       dockerfile: docker/namada-interface.Dockerfile
       context: .
-    image: arashidos/namada-interface:commit-d58c0f4 #supports namada v0.27.0
+    image: arashidos/namada-interface:${INTERFACE_TAG}
     entrypoint: [ "sh", "/docker-entrypoint-scripts.d/start-node.sh" ]
     hostname: namada-interface
     env_file:

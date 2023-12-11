@@ -11,26 +11,39 @@ cleanup() {
 
 export PUBLIC_IP=$(ip a | grep -oE 'inet ([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2} brd ([0-9]{1,3}\.){3}[0-9]{1,3}' | grep -v '127.0.0.1' | awk '{print $2}' | cut -d '/' -f1)
 export ALIAS=$(hostname)
+export TX_FILE_PATH="/root/.local/share/namada/pre-genesis/transactions.toml"
 
 if [ ! -f "/root/.namada-shared/chain.config" ]; then
   # generate validator keys
   WALLET_KEY="$ALIAS-wallet"
-  expect /scripts/key-gen.exp $WALLET_KEY
+  # generate account
+  namadaw --pre-genesis key gen --alias $WALLET_KEY --unsafe-dont-encrypt
+  # generate established account
+  ESTABLISHED_ACC_OUTPUT=$(namadac utils init-genesis-established-account --path $TX_FILE_PATH --aliases $WALLET_KEY)
+  echo "$ESTABLISHED_ACC_OUTPUT"
+  ESTABLISHED_ACCOUNT_ADDRESS=$(echo "$ESTABLISHED_ACC_OUTPUT" | grep -o 'tnam[[:alnum:]]*')
 
-  namada client utils init-genesis-validator \
-    --source $WALLET_KEY \
+  namadac utils init-genesis-validator \
+    --address $ESTABLISHED_ACCOUNT_ADDRESS \
     --alias $ALIAS \
     --net-address "${PUBLIC_IP}:26656" \
     --commission-rate 0.05 \
     --max-commission-rate-change 0.01 \
-    --transfer-from-source-amount 10000000 \
     --self-bond-amount 1000000 \
     --email "$ALIAS@namada.net" \
+    --path $TX_FILE_PATH \
     --unsafe-dont-encrypt
 
   # Pre-genesis toml is written to /root/.local/share/namada/pre-genesis/namada-x/transactions.toml
   mkdir -p /root/.namada-shared/$ALIAS
-  cp -a /root/.local/share/namada/pre-genesis/$ALIAS/transactions.toml /root/.namada-shared/$ALIAS
+
+  # Sign validators transactions file
+  namadac utils sign-genesis-txs \
+      --path $TX_FILE_PATH \
+      --output /root/.local/share/namada/pre-genesis/signed-transactions.toml \
+      --alias $ALIAS
+
+  cp -a /root/.local/share/namada/pre-genesis/signed-transactions.toml /root/.namada-shared/$ALIAS/transactions.toml
 fi
 
 ############  generating chain configs, done on host namada-1 only ############
@@ -47,27 +60,29 @@ if [ $(hostname) = "namada-1" ]; then
 
     # create a pgf steward account with alias 'steward-1' and generate signed toml
     STEWARD_ALIAS="steward-1"
-    expect /scripts/key-gen.exp $STEWARD_ALIAS
-    STEWARD_PK=$(namadaw key find --alias $STEWARD_ALIAS | awk -F ' ' 'NR == 2 {print $3}')
-    mkdir /root/.namada-shared/$STEWARD_ALIAS
-    cp /genesis/blank_account.toml /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml
-    sed -i "s#ALIAS#$STEWARD_ALIAS#g" /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml
-    sed -i "s#AMOUNT#1000000000#g" /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml
-    sed -i "s#PUBLIC_KEY#$STEWARD_PK#g" /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml
-    namadac utils sign-genesis-tx --path /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml --output /root/.namada-shared/$STEWARD_ALIAS/transactions.toml
-    rm /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml
+    namadaw --pre-genesis key gen --alias $STEWARD_ALIAS --unsafe-dont-encrypt
+#
+#    STEWARD_PK=$(namadaw --pre-genesis key find --alias $STEWARD_ALIAS | awk -F ' ' 'NR == 2 {print $3}')
+#    mkdir /root/.namada-shared/$STEWARD_ALIAS
+#    cp /genesis/blank_account.toml /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml
+#    sed -i "s#ALIAS#$STEWARD_ALIAS#g" /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml
+#    sed -i "s#AMOUNT#1000000000#g" /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml
+#    sed -i "s#PUBLIC_KEY#$STEWARD_PK#g" /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml
+#    namadac utils sign-genesis-txs --path /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml --output /root/.namada-shared/$STEWARD_ALIAS/transactions.toml
+#    rm /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml
 
     # create a pgf steward account with alias 'steward-1' and generate signed toml
     FAUCET_ALIAS="faucet-1"
-    expect /scripts/key-gen.exp $FAUCET_ALIAS
-    FAUCET_PK=$(namadaw key find --alias $FAUCET_ALIAS | awk -F ' ' 'NR == 2 {print $3}')
-    mkdir /root/.namada-shared/$FAUCET_ALIAS
-    cp /genesis/blank_account.toml /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml
-    sed -i "s#ALIAS#$FAUCET_ALIAS#g" /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml
-    sed -i "s#AMOUNT#9123372036854000000#g" /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml
-    sed -i "s#PUBLIC_KEY#$FAUCET_PK#g" /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml
-    namadac utils sign-genesis-tx --path /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml --output /root/.namada-shared/$FAUCET_ALIAS/transactions.toml
-    rm /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml
+    namadaw --pre-genesis key gen --alias $FAUCET_ALIAS --unsafe-dont-encrypt
+#
+#    FAUCET_PK=$(namadaw --pre-genesis key find --alias $FAUCET_ALIAS | awk -F ' ' 'NR == 2 {print $3}')
+#    mkdir /root/.namada-shared/$FAUCET_ALIAS
+#    cp /genesis/blank_account.toml /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml
+#    sed -i "s#ALIAS#$FAUCET_ALIAS#g" /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml
+#    sed -i "s#AMOUNT#9123372036854000000#g" /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml
+#    sed -i "s#PUBLIC_KEY#$FAUCET_PK#g" /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml
+#    namadac utils sign-genesis-txs --path /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml --output /root/.namada-shared/$FAUCET_ALIAS/transactions.toml
+#    rm /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml
 
     # create directory for genesis toml files
     mkdir -p /root/.namada-shared/genesis
@@ -75,20 +90,22 @@ if [ $(hostname) = "namada-1" ]; then
     cp /genesis/tokens.toml /root/.namada-shared/genesis/tokens.toml
     cp /genesis/validity-predicates.toml /root/.namada-shared/genesis/validity-predicates.toml
     cp /genesis/transactions.toml /root/.namada-shared/genesis/transactions.toml
+    # TODO arash: remove this line, this should be populated in python script
+    cp /genesis/balances.toml /root/.namada-shared/genesis/balances.toml
 
     # add genesis transactions to transactions.toml
     # TODO: move to python script
     cat /root/.namada-shared/namada-1/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
     cat /root/.namada-shared/namada-2/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
     cat /root/.namada-shared/namada-3/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
-    cat /root/.namada-shared/$STEWARD_ALIAS/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
-    cat /root/.namada-shared/$FAUCET_ALIAS/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
+#    cat /root/.namada-shared/$STEWARD_ALIAS/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
+#    cat /root/.namada-shared/$FAUCET_ALIAS/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
 
     # python script to read validator/bertha pk's from their toml files, and add them to the balances.toml
     python3 /scripts/make_balances.py /root/.namada-shared /genesis/balances.toml > /root/.namada-shared/genesis/balances.toml
 
     INIT_OUTPUT=$(namadac utils init-network \
-      --genesis-time "2023-11-13T00:00:00Z" \
+      --genesis-time "2023-12-11T00:00:00Z" \
       --wasm-checksums-path /wasm/checksums.json \
       --chain-prefix local \
       --templates-path /root/.namada-shared/genesis \
@@ -137,7 +154,7 @@ export CHAIN_ID=$(awk 'NR==2' /root/.namada-shared/chain.config)
 export NAMADA_NETWORK_CONFIGS_SERVER="http://namada-1:8123"
 curl $NAMADA_NETWORK_CONFIGS_SERVER
 rm -rf /root/.local/share/namada/$CHAIN_ID
-namada client utils join-network \
+namadac utils join-network \
   --chain-id $CHAIN_ID --genesis-validator $ALIAS --dont-prefetch-wasm
 
 # copy wasm to namada dir
@@ -159,8 +176,8 @@ fi
 
 if [ $(hostname) = "namada-1" ]; then
 rm -f /root/.namada-shared/tokens-addresses
-namadaw address find --alias nam | grep -o 'tnam[^ ]*' >> /root/.namada-shared/tokens-addresses
-namadaw address find --alias eth | grep -o 'tnam[^ ]*' >> /root/.namada-shared/tokens-addresses
+namadaw --pre-genesis address find --alias nam | grep -o 'tnam[^ ]*' >> /root/.namada-shared/tokens-addresses
+namadaw --pre-genesis address find --alias eth | grep -o 'tnam[^ ]*' >> /root/.namada-shared/tokens-addresses
 fi
 # start node
 NAMADA_LOG=info CMT_LOG_LEVEL=p2p:none,pex:error NAMADA_CMT_STDOUT=true namada node ledger run

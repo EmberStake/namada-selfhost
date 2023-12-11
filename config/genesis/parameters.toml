@@ -16,7 +16,7 @@ tx_whitelist = []
 # Implicit VP WASM name
 implicit_vp = "vp_implicit"
 # Expected number of epochs per year (also sets the min duration of an epoch in seconds)
-epochs_per_year = 105_120
+epochs_per_year = 31_536_000
 # The P gain factor in the Proof of Stake rewards controller
 pos_gain_p = "0.1"
 # The D gain factor in the Proof of Stake rewards controller
@@ -73,7 +73,6 @@ liveness_window_check = 100
 # the `liveness_window_check`
 liveness_threshold = "0.9"
 
-
 # Governance parameters.
 [gov_params]
 # minimum amount of nam token to lock
@@ -87,12 +86,12 @@ max_proposal_period = 27
 # maximum number of characters in the proposal content
 max_proposal_content_size = 10000
 # minimum epochs between end and grace epoch
-min_proposal_grace_epochs = 3
+min_proposal_grace_epochs = 6
 
 # Public goods funding parameters
 [pgf_params]
-# Initial set of stewards
-stewards = ["steward-1"]
+# Initial set of stewards # TODO arash : replace this with real address of stewards
+stewards = []
 # The pgf funding inflation rate
 pgf_inflation_rate = "0.1"
 # The pgf stewards inflation rate

@@ -21,7 +21,7 @@ for subdir in os.listdir(validator_directory):
       transactions_toml = toml.load(toml_file_path)
       balances_config[alias] = {
         'source': {
-          'pk': transactions_toml['transfer'][0]['source']
+          'pk': transactions_toml['validator_account'][0]['address']
         }
       }
 
