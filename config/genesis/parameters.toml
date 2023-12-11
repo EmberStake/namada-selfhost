@@ -91,7 +91,7 @@ min_proposal_grace_epochs = 6
 # Public goods funding parameters
 [pgf_params]
 # Initial set of stewards # TODO arash : replace this with real address of stewards
-stewards = []
+stewards = ["steward-1"]
 # The pgf funding inflation rate
 pgf_inflation_rate = "0.1"
 # The pgf stewards inflation rate

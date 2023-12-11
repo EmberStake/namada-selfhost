@@ -61,19 +61,15 @@ if [ $(hostname) = "namada-1" ]; then
     # create a pgf steward account with alias 'steward-1' and generate signed toml
     STEWARD_ALIAS="steward-1"
     namadaw --pre-genesis key gen --alias $STEWARD_ALIAS --unsafe-dont-encrypt
-#
-#    STEWARD_PK=$(namadaw --pre-genesis key find --alias $STEWARD_ALIAS | awk -F ' ' 'NR == 2 {print $3}')
-#    mkdir /root/.namada-shared/$STEWARD_ALIAS
-#    cp /genesis/blank_account.toml /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml
-#    sed -i "s#ALIAS#$STEWARD_ALIAS#g" /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml
-#    sed -i "s#AMOUNT#1000000000#g" /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml
-#    sed -i "s#PUBLIC_KEY#$STEWARD_PK#g" /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml
-#    namadac utils sign-genesis-txs --path /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml --output /root/.namada-shared/$STEWARD_ALIAS/transactions.toml
-#    rm /root/.namada-shared/$STEWARD_ALIAS/unsigned.toml
 
-    # create a pgf steward account with alias 'steward-1' and generate signed toml
-    FAUCET_ALIAS="faucet-1"
-    namadaw --pre-genesis key gen --alias $FAUCET_ALIAS --unsafe-dont-encrypt
+    # generate established account for steward-1
+    mkdir -p /root/.namada-shared/$STEWARD_ALIAS
+
+    STEWARD_ESTABLISHED=$(namadac utils init-genesis-established-account --path /root/.namada-shared/$STEWARD_ALIAS/transactions.toml --aliases $STEWARD_ALIAS)
+    STEWARD_TNAM=$(echo "$STEWARD_ESTABLISHED" | grep -o 'tnam[[:alnum:]]*')
+
+#    FAUCET_ALIAS="faucet-1"
+#    namadaw --pre-genesis key gen --alias $FAUCET_ALIAS --unsafe-dont-encrypt
 #
 #    FAUCET_PK=$(namadaw --pre-genesis key find --alias $FAUCET_ALIAS | awk -F ' ' 'NR == 2 {print $3}')
 #    mkdir /root/.namada-shared/$FAUCET_ALIAS
@@ -86,23 +82,23 @@ if [ $(hostname) = "namada-1" ]; then
 
     # create directory for genesis toml files
     mkdir -p /root/.namada-shared/genesis
-    cp /genesis/parameters.toml /root/.namada-shared/genesis/parameters.toml
+#    cp /genesis/parameters.toml /root/.namada-shared/genesis/parameters.toml
     cp /genesis/tokens.toml /root/.namada-shared/genesis/tokens.toml
     cp /genesis/validity-predicates.toml /root/.namada-shared/genesis/validity-predicates.toml
     cp /genesis/transactions.toml /root/.namada-shared/genesis/transactions.toml
     # TODO arash: remove this line, this should be populated in python script
-    cp /genesis/balances.toml /root/.namada-shared/genesis/balances.toml
+#    cp /genesis/balances.toml /root/.namada-shared/genesis/balances.toml
 
     # add genesis transactions to transactions.toml
     # TODO: move to python script
     cat /root/.namada-shared/namada-1/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
     cat /root/.namada-shared/namada-2/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
     cat /root/.namada-shared/namada-3/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
-#    cat /root/.namada-shared/$STEWARD_ALIAS/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
+    cat /root/.namada-shared/$STEWARD_ALIAS/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
 #    cat /root/.namada-shared/$FAUCET_ALIAS/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
 
-    # python script to read validator/bertha pk's from their toml files, and add them to the balances.toml
     python3 /scripts/make_balances.py /root/.namada-shared /genesis/balances.toml > /root/.namada-shared/genesis/balances.toml
+    python3 /scripts/update_params.py /genesis/parameters.toml "$STEWARD_TNAM" > /root/.namada-shared/genesis/parameters.toml
 
     INIT_OUTPUT=$(namadac utils init-network \
       --genesis-time "2023-12-11T00:00:00Z" \
@@ -127,7 +123,7 @@ if [ $(hostname) = "namada-1" ]; then
 
   if [ ! -f "/root/.namada-shared/chain.config" ]; then
     # write config server info to shared volume
-    sleep 2
+    sleep 1
     printf "%b\n%b" "$PUBLIC_IP" "$CHAIN_ID" | tee /root/.namada-shared/chain.config
   fi
 
@@ -136,8 +132,8 @@ if [ $(hostname) = "namada-1" ]; then
 ### other nodes should pause here until chain configs are ready ###
 else
   while [ ! -f "/root/.namada-shared/chain.config" ]; do
-    echo "Configs server info not ready. Sleeping for 5s..."
-    sleep 5
+    echo "Configs server info not ready. Sleeping for 2s..."
+    sleep 2
   done
 
   echo "Configs server info found, proceeding with network setup"
@@ -146,7 +142,7 @@ fi
 ############ all nodes resume here ############
 
 # one last sleep to make sure configs server has been given time to start
-sleep 5
+sleep 3
 
 # get chain config server info
 CONFIG_IP=$(awk 'NR==1' /root/.namada-shared/chain.config)

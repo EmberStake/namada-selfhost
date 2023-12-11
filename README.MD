@@ -6,6 +6,8 @@ There are a bunch of [blog posts](https://mirror.xyz/0xe4e0B45aa2b06Df651337E351
 ### Requirements
 - Docker (or Docker Desktop on Windows/Mac) 
 ---
+# Important!
+IF YOU ARE UPGRADING THIS PACKAGE FROM OLDER VERSIONS MAKE SURE CORRECT NAMADA VERSIONS ARE SET IN YOUR `.env` FILE.   
 
 ## Initialize settings
 
