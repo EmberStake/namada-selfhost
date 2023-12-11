@@ -34,7 +34,6 @@ if [ ! -f "/root/.namada-shared/chain.config" ]; then
     --path $TX_FILE_PATH \
     --unsafe-dont-encrypt
 
-  # Pre-genesis toml is written to /root/.local/share/namada/pre-genesis/namada-x/transactions.toml
   mkdir -p /root/.namada-shared/$ALIAS
 
   # Sign validators transactions file
@@ -80,6 +79,8 @@ if [ $(hostname) = "namada-1" ]; then
     cp /genesis/validity-predicates.toml /root/.namada-shared/genesis/validity-predicates.toml
     cp /genesis/transactions.toml /root/.namada-shared/genesis/transactions.toml
 
+    # make a copy of wallet to namada folder for convenience (access to faucet account keys)
+    cp -a /root/.local/share/namada/pre-genesis/wallet.toml /root/.local/share/namada/wallet.toml
     # add genesis transactions to transactions.toml
     # TODO: move to python script
     cat /root/.namada-shared/namada-1/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
