@@ -68,26 +68,17 @@ if [ $(hostname) = "namada-1" ]; then
     STEWARD_ESTABLISHED=$(namadac utils init-genesis-established-account --path /root/.namada-shared/$STEWARD_ALIAS/transactions.toml --aliases $STEWARD_ALIAS)
     STEWARD_TNAM=$(echo "$STEWARD_ESTABLISHED" | grep -o 'tnam[[:alnum:]]*')
 
-#    FAUCET_ALIAS="faucet-1"
-#    namadaw --pre-genesis key gen --alias $FAUCET_ALIAS --unsafe-dont-encrypt
-#
-#    FAUCET_PK=$(namadaw --pre-genesis key find --alias $FAUCET_ALIAS | awk -F ' ' 'NR == 2 {print $3}')
-#    mkdir /root/.namada-shared/$FAUCET_ALIAS
-#    cp /genesis/blank_account.toml /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml
-#    sed -i "s#ALIAS#$FAUCET_ALIAS#g" /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml
-#    sed -i "s#AMOUNT#9123372036854000000#g" /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml
-#    sed -i "s#PUBLIC_KEY#$FAUCET_PK#g" /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml
-#    namadac utils sign-genesis-txs --path /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml --output /root/.namada-shared/$FAUCET_ALIAS/transactions.toml
-#    rm /root/.namada-shared/$FAUCET_ALIAS/unsigned.toml
+    # create a faucet account
+    FAUCET_ALIAS="faucet-1"
+    namadaw --pre-genesis key gen --alias $FAUCET_ALIAS --unsafe-dont-encrypt
+    mkdir /root/.namada-shared/$FAUCET_ALIAS
+    namadac utils init-genesis-established-account --path /root/.namada-shared/$FAUCET_ALIAS/transactions.toml --aliases $FAUCET_ALIAS
 
     # create directory for genesis toml files
     mkdir -p /root/.namada-shared/genesis
-#    cp /genesis/parameters.toml /root/.namada-shared/genesis/parameters.toml
     cp /genesis/tokens.toml /root/.namada-shared/genesis/tokens.toml
     cp /genesis/validity-predicates.toml /root/.namada-shared/genesis/validity-predicates.toml
     cp /genesis/transactions.toml /root/.namada-shared/genesis/transactions.toml
-    # TODO arash: remove this line, this should be populated in python script
-#    cp /genesis/balances.toml /root/.namada-shared/genesis/balances.toml
 
     # add genesis transactions to transactions.toml
     # TODO: move to python script
@@ -95,7 +86,7 @@ if [ $(hostname) = "namada-1" ]; then
     cat /root/.namada-shared/namada-2/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
     cat /root/.namada-shared/namada-3/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
     cat /root/.namada-shared/$STEWARD_ALIAS/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
-#    cat /root/.namada-shared/$FAUCET_ALIAS/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
+    cat /root/.namada-shared/$FAUCET_ALIAS/transactions.toml >> /root/.namada-shared/genesis/transactions.toml
 
     python3 /scripts/make_balances.py /root/.namada-shared /genesis/balances.toml > /root/.namada-shared/genesis/balances.toml
     python3 /scripts/update_params.py /genesis/parameters.toml "$STEWARD_TNAM" > /root/.namada-shared/genesis/parameters.toml
