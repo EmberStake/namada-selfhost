@@ -164,8 +164,8 @@ fi
 
 if [ $(hostname) = "namada-1" ]; then
 rm -f /root/.namada-shared/tokens-addresses
-namadaw --pre-genesis address find --alias nam | grep -o 'tnam[^ ]*' >> /root/.namada-shared/tokens-addresses
-namadaw --pre-genesis address find --alias eth | grep -o 'tnam[^ ]*' >> /root/.namada-shared/tokens-addresses
+namadaw find --alias nam | grep -o 'tnam[^ ]*' >> /root/.namada-shared/tokens-addresses
+namadaw find --alias eth | grep -o 'tnam[^ ]*' >> /root/.namada-shared/tokens-addresses
 fi
 # start node
 NAMADA_LOG=info CMT_LOG_LEVEL=p2p:none,pex:error NAMADA_CMT_STDOUT=true namada node ledger run

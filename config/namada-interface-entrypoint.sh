@@ -17,27 +17,21 @@ original_dir=$(pwd)
     sleep 5
   done
 
-export REACT_APP_NAMADA_CHAIN_ID=$(awk 'NR==2' /root/.namada-shared/chain.config)
+export NAMADA_INTERFACE_NAMADA_CHAIN_ID=$(awk 'NR==2' /root/.namada-shared/chain.config)
 export NAM_ADDR=$(awk 'NR==1' /root/.namada-shared/tokens-addresses)
 export ETH_ADDR=$(awk 'NR==2' /root/.namada-shared/tokens-addresses)
 
 
 # Update hard coded token addresses in the specified file
-replace_token_address "packages/shared/lib/src/query.rs" \
-  "tnam1qyytnlley9h2mw5pjzsp862uuqhc2l0h5uqx397y" \
-  "$NAM_ADDR"
-replace_token_address "packages/shared/lib/src/query.rs" \
-  "tnam1q8r6dc0kh2xuxzjy75cgt4tfqchf4k8cguuvxkuh" \
-  "$ETH_ADDR"
 replace_token_address "packages/types/src/tx/tokens/types/index.ts" \
-  "tnam1qyytnlley9h2mw5pjzsp862uuqhc2l0h5uqx397y" \
+  "tnam1q9mjvqd45u7w54kee2aquugtv7vn7h3xrcrau7xy" \
   "$NAM_ADDR"
 
 replace_token_address "packages/types/src/tx/tokens/types/index.ts" \
-  "tnam1q8r6dc0kh2xuxzjy75cgt4tfqchf4k8cguuvxkuh" \
+  "tnam1q9anasrx0gqeuxrc22a0uefe82kw08avhcasevng" \
   "$ETH_ADDR"
 
-echo "Chain id is $REACT_APP_NAMADA_CHAIN_ID"
+echo "Chain id is $NAMADA_INTERFACE_NAMADA_CHAIN_ID"
 env > "$original_dir/apps/namada-interface/.env"
 
   if [ ! -d "apps/namada-interface/node_modules" ]; then
