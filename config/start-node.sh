@@ -17,7 +17,7 @@ if [ ! -f "/root/.namada-shared/chain.config" ]; then
   # generate validator keys
   WALLET_KEY="$ALIAS-wallet"
   # generate account
-  namadaw --pre-genesis key gen --alias $WALLET_KEY --unsafe-dont-encrypt
+  namadaw --pre-genesis gen --alias $WALLET_KEY --unsafe-dont-encrypt
   # generate established account
   ESTABLISHED_ACC_OUTPUT=$(namadac utils init-genesis-established-account --path $TX_FILE_PATH --aliases $WALLET_KEY)
   echo "$ESTABLISHED_ACC_OUTPUT"
@@ -59,7 +59,7 @@ if [ $(hostname) = "namada-1" ]; then
 
     # create a pgf steward account with alias 'steward-1' and generate signed toml
     STEWARD_ALIAS="steward-1"
-    namadaw --pre-genesis key gen --alias $STEWARD_ALIAS --unsafe-dont-encrypt
+    namadaw --pre-genesis gen --alias $STEWARD_ALIAS --unsafe-dont-encrypt
 
     # generate established account for steward-1
     mkdir -p /root/.namada-shared/$STEWARD_ALIAS
@@ -69,7 +69,7 @@ if [ $(hostname) = "namada-1" ]; then
 
     # create a faucet account
     FAUCET_ALIAS="faucet-1"
-    namadaw --pre-genesis key gen --alias $FAUCET_ALIAS --unsafe-dont-encrypt
+    namadaw --pre-genesis gen --alias $FAUCET_ALIAS --unsafe-dont-encrypt
     mkdir /root/.namada-shared/$FAUCET_ALIAS
     namadac utils init-genesis-established-account --path /root/.namada-shared/$FAUCET_ALIAS/transactions.toml --aliases $FAUCET_ALIAS
 
@@ -164,8 +164,8 @@ fi
 
 if [ $(hostname) = "namada-1" ]; then
 rm -f /root/.namada-shared/tokens-addresses
-namadaw --pre-genesis address find --alias nam | grep -o 'tnam[^ ]*' >> /root/.namada-shared/tokens-addresses
-namadaw --pre-genesis address find --alias eth | grep -o 'tnam[^ ]*' >> /root/.namada-shared/tokens-addresses
+namadaw find --alias nam | grep -o 'tnam[^ ]*' >> /root/.namada-shared/tokens-addresses
+namadaw find --alias eth | grep -o 'tnam[^ ]*' >> /root/.namada-shared/tokens-addresses
 fi
 # start node
 NAMADA_LOG=info CMT_LOG_LEVEL=p2p:none,pex:error NAMADA_CMT_STDOUT=true namada node ledger run

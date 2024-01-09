@@ -1,5 +1,5 @@
 FROM node:lts-bookworm
-ARG COMMIT_TAG=d58c0f4
+ARG REPO_TAG="v0.1.0-2bf3a75"
 
 RUN apt-get update && \
     apt-get install -y \
@@ -20,8 +20,7 @@ RUN rustup target add wasm32-unknown-unknown && \
 RUN  yarn global add web-ext
 
 WORKDIR /root
-RUN git clone --branch main https://github.com/anoma/namada-interface.git && \
-    cd namada-interface && \
-    git reset --hard ${COMMIT_TAG}
-WORKDIR namada-interface
+RUN git clone --branch main https://github.com/anoma/namada-interface.git
+WORKDIR /root/namada-interface
+RUN git checkout ${REPO_TAG}
 

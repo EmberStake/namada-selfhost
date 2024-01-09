@@ -1,13 +1,4 @@
-FROM lukemathwalker/cargo-chef:latest-rust-1.70.0 AS chef
-WORKDIR /app
-
-FROM chef AS planner
-ARG NAMADA_TAG=main
-RUN git clone -b ${NAMADA_TAG} --single-branch https://github.com/anoma/namada.git
-WORKDIR /app/namada
-RUN cargo chef prepare --recipe-path recipe.json
-
-FROM chef AS builder
+FROM rust:1.70 AS builder
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y \
@@ -20,8 +11,6 @@ RUN apt-get update && apt-get install -y \
     libudev-dev \
     && apt-get clean
 
-COPY --from=planner /app/namada/recipe.json recipe.json
-
 ARG BUILD_WASM=false
 ENV WASM=${BUILD_WASM}
 RUN if [ "$WASM" = "true" ]; then \
@@ -30,19 +19,16 @@ RUN if [ "$WASM" = "true" ]; then \
     cp /root/binaryen-version_116/bin/* /usr/local/bin; \
     fi
 
-RUN cargo chef cook --release --recipe-path recipe.json
 ARG NAMADA_TAG=main
-RUN git clone -b ${NAMADA_TAG} --single-branch https://github.com/anoma/namada.git
-
+RUN git clone https://github.com/anoma/namada.git
 WORKDIR /app/namada
+RUN git checkout ${NAMADA_TAG}
 
+RUN make build-release
 RUN if [ "$WASM" = "true" ]; then \
     rustup target add wasm32-unknown-unknown && \
     make build-wasm-scripts; \
     fi
-
-# RUN make build-wasm-scripts
-RUN make build-release
 
 FROM golang:1.18.0 as tendermint-builder
 WORKDIR /app
@@ -55,9 +41,6 @@ FROM debian:bullseye-slim AS runtime
 
 RUN apt-get update && apt-get install libcurl4-openssl-dev curl nano jq iproute2 procps python3 python3-pip expect -y && apt-get clean
 RUN pip install toml
-
-#RUN useradd --create-home namada
-#USER namada
 
 COPY --from=builder /app/namada/wasm/*.wasm /app/namada/wasm/*.json /wasm/
 
