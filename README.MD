@@ -30,7 +30,7 @@ docker compose build
 
 To start the blockchain 
 ```shell
-docker compose up -d
+docker compose up -d namada-1 namada-2 namada-3
 ```
 for the first time launching it give it 2-3 min to download necessary files and setup the chain. then you can use it   
 
@@ -56,7 +56,9 @@ This stack comes with a container named `interface` which serves the [official n
 It also builds the Namada Browser extension during the startup. The chain ID is automatically set to the local running Namada blockchain.    
 You can tweak supported environment variables through the `.env` file.    
 Building cloud take a very long time to finish, so be patient, in the meantime you can work with the CLI.    
-
+```shell
+docker compose up -d interface
+```
 ## Using the Interface
 When the container is ready you can access the Interface in your browser, the default address is http://localhost:3000/
 
