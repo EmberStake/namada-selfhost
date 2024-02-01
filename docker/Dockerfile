@@ -1,5 +1,8 @@
-FROM rust:1.70 AS builder
-WORKDIR /app
+FROM rust:1.70.0-bullseye AS builder
+WORKDIR /__w/namada
+# The version should be matching the version set above
+RUN rustup toolchain install 1.70.0 --profile minimal
+RUN rustup target add wasm32-unknown-unknown
 
 RUN apt-get update && apt-get install -y \
     build-essential \
@@ -11,24 +14,18 @@ RUN apt-get update && apt-get install -y \
     libudev-dev \
     && apt-get clean
 
-ARG BUILD_WASM=false
-ENV WASM=${BUILD_WASM}
-RUN if [ "$WASM" = "true" ]; then \
-    wget -P /root https://github.com/WebAssembly/binaryen/releases/download/version_116/binaryen-version_116-x86_64-linux.tar.gz && \
-    tar -xzf /root/binaryen-version_116-x86_64-linux.tar.gz -C /root && \
-    cp /root/binaryen-version_116/bin/* /usr/local/bin; \
-    fi
+# Download binaryen and extract wasm-opt
+ADD https://github.com/WebAssembly/binaryen/releases/download/version_113/binaryen-version_113-x86_64-linux.tar.gz /tmp/binaryen.tar.gz
+RUN tar -xf /tmp/binaryen.tar.gz
+RUN mv binaryen-version_*/bin/wasm-opt /usr/local/bin
 
 ARG NAMADA_TAG=main
 RUN git clone https://github.com/anoma/namada.git
-WORKDIR /app/namada
+WORKDIR /__w/namada/namada
 RUN git checkout ${NAMADA_TAG}
 
 RUN make build-release
-RUN if [ "$WASM" = "true" ]; then \
-    rustup target add wasm32-unknown-unknown && \
-    make build-wasm-scripts; \
-    fi
+RUN make build-wasm-scripts
 
 FROM golang:1.18.0 as tendermint-builder
 WORKDIR /app
@@ -42,12 +39,12 @@ FROM debian:bullseye-slim AS runtime
 RUN apt-get update && apt-get install libcurl4-openssl-dev curl nano jq iproute2 procps python3 python3-pip expect -y && apt-get clean
 RUN pip install toml
 
-COPY --from=builder /app/namada/wasm/*.wasm /app/namada/wasm/*.json /wasm/
+COPY --from=builder /__w/namada/namada/wasm/*.wasm /__w/namada/namada/wasm/*.json /wasm/
 
-COPY --from=builder /app/namada/target/release/namada /usr/local/bin
-COPY --from=builder /app/namada/target/release/namadan /usr/local/bin
-COPY --from=builder /app/namada/target/release/namadaw /usr/local/bin
-COPY --from=builder /app/namada/target/release/namadac /usr/local/bin
+COPY --from=builder /__w/namada/namada/target/release/namada /usr/local/bin
+COPY --from=builder /__w/namada/namada/target/release/namadan /usr/local/bin
+COPY --from=builder /__w/namada/namada/target/release/namadaw /usr/local/bin
+COPY --from=builder /__w/namada/namada/target/release/namadac /usr/local/bin
 COPY --from=tendermint-builder /app/cometbft/build/cometbft /usr/local/bin
 
 EXPOSE 26656
