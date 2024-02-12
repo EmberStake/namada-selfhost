@@ -74,10 +74,22 @@ services:
       - ./extensions:/build
     ports:
       - "${INTERFACE_PORT}:3000"
+  namada-chain-b:
+    <<: *namada-common
+    hostname: chain-b
+    volumes:
+      - ./config/genesis-second-chain:/genesis:ro
+      - ./config/make_balances.py:/scripts/make_balances.py
+      - ./config/update_params.py:/scripts/update_params.py
+      - ./masp-params:/root/.masp-params
+      - ./config/start-chain-b.sh:/docker-entrypoint-scripts.d/start-node.sh
+      - namada-shared:/root/.namada-shared
+      - namada-chain-b_data:/root/.local/share/namada
 volumes:
   namada-1_data:
   namada-2_data:
   namada-3_data:
+  namada-chain-b_data:
   namada-shared:
   namada-interface:
 
