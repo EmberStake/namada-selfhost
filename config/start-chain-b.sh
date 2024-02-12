@@ -1,19 +1,11 @@
 #!/bin/bash
-
-# TODO: set chain-prefix by env var
-
-#namada --version
-
-# clean up the http server when the script exits
-#cleanup() {
-#    pkill -f "/serve"
-#}
+namada --version
 
 export PUBLIC_IP=$(ip a | grep -oE 'inet ([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2} brd ([0-9]{1,3}\.){3}[0-9]{1,3}' | grep -v '127.0.0.1' | awk '{print $2}' | cut -d '/' -f1)
 export ALIAS=$(hostname)
 export TX_FILE_PATH="/root/.local/share/namada/pre-genesis/transactions.toml"
 
-if [ ! -f "/root/.namada-chain-b/chain-b.config" ]; then
+if [ ! -f "/root/.namada-shared/chain-b.config" ]; then
   # generate validator keys
   WALLET_KEY="$ALIAS-wallet"
   # generate account
@@ -45,33 +37,9 @@ if [ ! -f "/root/.namada-chain-b/chain-b.config" ]; then
   cp -a /root/.local/share/namada/pre-genesis/signed-transactions.toml /root/.namada-chain-b/$ALIAS/transactions.toml
 fi
 
-############  generating chain configs, done on host namada-1 only ############
-#if [ $(hostname) = "namada-1" ]; then
-
-  if [ ! -f "/root/.namada-chain-b/chain-b.config" ]; then
-    # wait until all validator configs have been written
-#    while [ ! -d "/root/.namada-chain-b/namada-1" ] || [ ! -d "/root/.namada-chain-b/namada-2" ] || [ ! -d "/root/.namada-chain-b/namada-3" ]; do
-#      echo "Validator configs not ready. Sleeping for 5s..."
-#      sleep 5
-#    done
+  if [ ! -f "/root/.namada-shared/chain-b.config" ]; then
 
     echo "Validator configs found. Generating chain configs..."
-
-    # create a pgf steward account with alias 'steward-1' and generate signed toml
-#    STEWARD_ALIAS="steward-1"
-#    namadaw --pre-genesis gen --alias $STEWARD_ALIAS --unsafe-dont-encrypt
-
-    # generate established account for steward-1
-#    mkdir -p /root/.namada-chain-b/$STEWARD_ALIAS
-
-#    STEWARD_ESTABLISHED=$(namadac utils init-genesis-established-account --path /root/.namada-chain-b/$STEWARD_ALIAS/transactions.toml --aliases $STEWARD_ALIAS)
-#    STEWARD_TNAM=$(echo "$STEWARD_ESTABLISHED" | grep -o 'tnam[[:alnum:]]*')
-
-    # create a faucet account
-#    FAUCET_ALIAS="faucet-1"
-#    namadaw --pre-genesis gen --alias $FAUCET_ALIAS --unsafe-dont-encrypt
-#    mkdir /root/.namada-chain-b/$FAUCET_ALIAS
-#    namadac utils init-genesis-established-account --path /root/.namada-chain-b/$FAUCET_ALIAS/transactions.toml --aliases $FAUCET_ALIAS
 
     # create directory for genesis toml files
     mkdir -p /root/.namada-chain-b/genesis
@@ -80,20 +48,10 @@ fi
     cp /genesis/transactions.toml /root/.namada-chain-b/genesis/transactions.toml
     cp /genesis/parameters.toml /root/.namada-chain-b/genesis/parameters.toml
 
-    # make a copy of wallet to namada folder for convenience (access to faucet account keys)
-#    cp -a /root/.local/share/namada/pre-genesis/wallet.toml /root/.local/share/namada/wallet.toml
     # add genesis transactions to transactions.toml
-    # TODO: move to python script
-#    cat /root/.namada-chain-b/namada-1/transactions.toml >> /root/.namada-chain-b/genesis/transactions.toml
-#    cat /root/.namada-chain-b/namada-2/transactions.toml >> /root/.namada-chain-b/genesis/transactions.toml
-#    cat /root/.namada-chain-b/namada-3/transactions.toml >> /root/.namada-chain-b/genesis/transactions.toml
-
     cat /root/.namada-chain-b/chain-b/transactions.toml >> /root/.namada-chain-b/genesis/transactions.toml
-#    cat /root/.namada-chain-b/$STEWARD_ALIAS/transactions.toml >> /root/.namada-chain-b/genesis/transactions.toml
-#    cat /root/.namada-chain-b/$FAUCET_ALIAS/transactions.toml >> /root/.namada-chain-b/genesis/transactions.toml
 
     python3 /scripts/make_balances.py /root/.namada-chain-b /genesis/balances.toml > /root/.namada-chain-b/genesis/balances.toml
-#    python3 /scripts/update_params.py /genesis/parameters.toml "$STEWARD_TNAM" > /root/.namada-chain-b/genesis/parameters.toml
 
     INIT_OUTPUT=$(namadac utils init-network \
       --genesis-time "2023-12-11T00:00:00Z" \
@@ -109,41 +67,12 @@ fi
     echo "Chain id: $CHAIN_ID"
   fi
 
-  # serve config tar over http
-#  echo "Serving configs..."
-#  mkdir -p /serve
-#  cp *.tar.gz /serve
-#  trap cleanup EXIT
-#  nohup bash -c "python3 -m http.server --directory /serve 8123 &"
-
-  if [ ! -f "/root/.namada-chain-b/chain-b.config" ]; then
+  if [ ! -f "/root/.namada-shared/chain-b.config" ]; then
     # write config server info to shared volume
-    sleep 1
-    printf "%b\n%b" "$PUBLIC_IP" "$CHAIN_ID" | tee /root/.namada-chain-b/chain-b.config
+    printf "%b\n%b" "$PUBLIC_IP" "$CHAIN_ID" | tee /root/.namada-shared/chain-b.config
   fi
 
-### end namada-1 specific prep ###
-
-### other nodes should pause here until chain configs are ready ###
-#else
-#  while [ ! -f "/root/.namada-chain-b/chain-b.config" ]; do
-#    echo "Configs server info not ready. Sleeping for 2s..."
-#    sleep 2
-#  done
-#
-#  echo "Configs server info found, proceeding with network setup"
-#fi
-
-############ all nodes resume here ############
-
-# one last sleep to make sure configs server has been given time to start
-#sleep 3
-
-# get chain config server info
-#CONFIG_IP=$(awk 'NR==1' /root/.namada-chain-b/chain-b.config)
-export CHAIN_ID=$(awk 'NR==2' /root/.namada-chain-b/chain-b.config)
-#export NAMADA_NETWORK_CONFIGS_SERVER="http://namada-1:8123"
-#curl $NAMADA_NETWORK_CONFIGS_SERVER
+export CHAIN_ID=$(awk 'NR==2' /root/.namada-shared/chain-b.config)
 export NAMADA_NETWORK_CONFIGS_DIR=$(pwd)
 rm -rf /root/.local/share/namada/$CHAIN_ID
 namadac utils join-network \
@@ -153,8 +82,6 @@ namadac utils join-network \
 cp -a /wasm/*.wasm /root/.local/share/namada/$CHAIN_ID/wasm
 cp -a /wasm/checksums.json /root/.local/share/namada/$CHAIN_ID/wasm
 
-# configure namada-1 node to advertise host public ip to outside peers if provided
-#EXTIP=${EXTIP:-''}
 if [ -n "$EXTIP" ]; then
 echo "Advertising public ip $EXTIP"
   sed -i "s#external_address = \".*\"#external_address = \"$EXTIP:${P2P_PORT:-26656}\"#g" /root/.local/share/namada/$CHAIN_ID/config.toml
@@ -166,10 +93,8 @@ fi
   sed -i "s#namespace = .*#namespace = \"tendermint\"#g" /root/.local/share/namada/$CHAIN_ID/config.toml
 
 
-#if [ $(hostname) = "namada-1" ]; then
-#rm -f /root/.namada-chain-b/tokens-addresses
-#namadaw find --alias nam | grep -o 'tnam[^ ]*' >> /root/.namada-chain-b/tokens-addresses
-#namadaw find --alias eth | grep -o 'tnam[^ ]*' >> /root/.namada-chain-b/tokens-addresses
-#fi
+rm -f /root/.namada-shared/chain-b-token-addrs
+namadaw find --alias nam | grep -o 'tnam[^ ]*' >> /root/.namada-shared/chain-b-token-addrs
+namadaw find --alias eth | grep -o 'tnam[^ ]*' >> /root/.namada-shared/chain-b-token-addrs
 # start node
 NAMADA_LOG=info CMT_LOG_LEVEL=p2p:none,pex:error NAMADA_CMT_STDOUT=true namada node ledger run

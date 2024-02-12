@@ -24,8 +24,7 @@ services:
       - namada-shared:/root/.namada-shared
       - namada-1_data:/root/.local/share/namada
     environment:
-      # - CHAIN_ID=$CHAIN_ID
-      - P2P_PORT=${P2P_PORT}
+      - GENESIS_DELAY=${GENESIS_DELAY}
       - EXTIP=${EXTIP}
     ports:
       - "${P2P_PORT}:26656" # p2p
@@ -77,10 +76,12 @@ services:
   namada-chain-b:
     <<: *namada-common
     hostname: chain-b
+    environment:
+      - GENESIS_DELAY=${GENESIS_DELAY}
+      - EXTIP=${EXTIP}
     volumes:
       - ./config/genesis-second-chain:/genesis:ro
       - ./config/make_balances.py:/scripts/make_balances.py
-      - ./config/update_params.py:/scripts/update_params.py
       - ./masp-params:/root/.masp-params
       - ./config/start-chain-b.sh:/docker-entrypoint-scripts.d/start-node.sh
       - namada-shared:/root/.namada-shared
