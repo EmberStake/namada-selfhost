@@ -96,6 +96,7 @@ services:
     networks:
       namada:
     volumes:
+      - ./config/hermes/config.toml:/root/.hermes/config.toml
       - namada-shared:/root/.namada-shared
       - hermes:/root/.hermes
 volumes:
