@@ -1,5 +1,5 @@
 [global]
-log_level = 'debug'
+log_level = 'info'
 
 [mode]
 
@@ -26,7 +26,7 @@ host = '127.0.0.1'
 port = 3001
 
 [[chains]]
-id = 'local.d3c75ccd0e6f04b1a164a67e'  # set your chain ID #TODO: update this using script
+id = 'local.5d5bde592f94bb98c958c8b3'  # set your chain ID #TODO: update this using script
 type = 'Namada'
 rpc_addr = 'http://namada-1:26657'  # set the IP and the port of the chain
 grpc_addr = 'http://namada-1:9090'  # not used for now
@@ -35,12 +35,11 @@ account_prefix = ''  # not used
 key_name = 'relayer'  # The key is an account name you made
 store_prefix = 'ibc'
 gas_price = { price = 0.001, denom = 'tnam1q87wtaqqtlwkw927gaff34hgda36huk0kgry692a' }  #TODO: update this using script # the price isn't used for now, the denom should be a raw token address
-trusting_period = '1333s' #TODO : use it in mainnet
-#trusting_period = '1s'
+trusting_period = '1333s'
 rpc_timeout = '60s'
 
 [[chains]]
-id = 'local.ff672a091f835e7c33ee8b8a' #TODO: update this using script
+id = 'local.fd43406dd6b18a81562ba9a4'
 type = 'Namada'
 rpc_addr = 'http://namada-chain-b:26657'
 grpc_addr = 'http://namada-chain-b:9090'
@@ -50,5 +49,4 @@ key_name = 'relayer'
 store_prefix = 'ibc'
 gas_price = { price = 0.001, denom = 'tnam1q87wtaqqtlwkw927gaff34hgda36huk0kgry692a' } #TODO: update this using script
 trusting_period = '1333s' #TODO : use it in mainnet
-#trusting_period = '1s'
 rpc_timeout = '60s'

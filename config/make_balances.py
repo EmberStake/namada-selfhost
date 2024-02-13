@@ -24,13 +24,12 @@ for subdir in os.listdir(validator_directory):
                 address = transactions_toml['validator_account'][0]['address']
                 balances_config[alias].append(address)
             except (KeyError, IndexError) as e:
-                continue
+                pass
             try:
                 address = transactions_toml['established_account'][0]['public_keys'][0]
                 balances_config[alias].append(address)
             except (KeyError, IndexError) as e:
-                continue
-
+                pass
 output_toml = toml.load(balances_toml)
 ACCOUNT_AMOUNT = "220000000000"
 FAUCET_AMOUNT = "9123372036854000000"

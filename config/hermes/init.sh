@@ -1,11 +1,9 @@
 #!/bin/bash
-#export CHAIN_A_ID="local.2888d38c45da22f49f06177e"
-#export CHAIN_B_ID="local.eebaeaba77a3dc28f6a5d48f"
+#mkdir -p ~/.namada-shared/chain-a && mkdir -p ~/.namada-shared/chain-b
 
-mkdir -p ~/.namada-shared/chain-a && mkdir -p ~/.namada-shared/chain-b
 
-export CHAIN_A_ID=$(awk 'NR==2' /root/.namada-shared/chain.config)
-export CHAIN_B_ID=$(awk 'NR==2' /root/.namada-shared/chain-b.config)
+export CHAIN_A_ID=$(curl -s namada-1:26657/status | jq '.result.node_info.network')
+export CHAIN_B_ID=$(curl -s chain-b:26657/status | jq '.result.node_info.network')
 export HERMES_CONFIG=/root/.hermes/config.toml
 # TODO : make relayer account on each chain init script
 # TODO : share each chain wallet.toml for hermes e.g:
