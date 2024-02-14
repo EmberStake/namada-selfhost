@@ -87,8 +87,9 @@ services:
       - namada-shared:/root/.namada-shared
       - namada-chain-b_data:/root/.local/share/namada
   hermes:
+    image: arashidos/hermes:1.7.4-namada-long-memo
     build:
-      dockerfile: docker/hermes.Dockerfile
+      dockerfile: docker/bakkhermes.Dockerfile
       context: .
       args:
         - HERMES_TAG=${HERMES_TAG}

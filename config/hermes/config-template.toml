@@ -37,6 +37,7 @@ store_prefix = 'ibc'
 gas_price = { price = 0.001, denom = '_NAM_A_ADDR_' } # the price isn't used for now, the denom should be a raw token address
 trusting_period = '1990s'
 rpc_timeout = '60s'
+memo_prefix = 'tpknam1qprzf0s5vtjqg09qyymul22msekwdnqfw5sxyex2th3l3cggpt4h62ysz9z'
 
 [[chains]]
 id = '_CHAIN_B_ID_'
@@ -50,3 +51,4 @@ store_prefix = 'ibc'
 gas_price = { price = 0.001, denom = '_NAM_B_ADDR_' }
 trusting_period = '1990s'
 rpc_timeout = '60s'
+memo_prefix = 'tpknam1qprzf0s5vtjqg09qyymul22msekwdnqfw5sxyex2th3l3cggpt4h62ysz9z'
