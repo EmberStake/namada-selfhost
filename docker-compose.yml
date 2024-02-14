@@ -93,10 +93,12 @@ services:
       args:
         - HERMES_TAG=${HERMES_TAG}
     hostname: hermes
+    entrypoint: ["sh", "/docker-entrypoint-scripts.d/start.sh"]
     networks:
       namada:
     volumes:
-      - ./config/hermes/config.toml:/root/.hermes/config.toml
+      - ./config/hermes/config-template.toml:/root/config-template.toml
+      - ./config/hermes/init.sh:/docker-entrypoint-scripts.d/start.sh
       - namada-shared:/root/.namada-shared
       - hermes:/root/.hermes
 volumes:
