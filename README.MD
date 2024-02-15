@@ -66,12 +66,12 @@ for more information about commands, check the [official docs](https://docs.nama
 To test hermes on a Namada <> Namada channel , we need another instance of namada blockchain. this is included under hermes profile in docker compose file.   
 To run chain B and the hermes container    
 ```shell
-docker compose up --profile hermes up
+docker compose --profile hermes up -d
 ```
 this will create chain-b , another namada blockchain with single validator and sets configs on the hermes and create a channel between two blockchains.   
 Hermes takes some time to be functional, so the check logs before start using it 
 ```shell
-docker compose logs -f --tail hermes
+docker compose logs -f hermes
 ```
 now exec into chain-b and get an address wallet from there
 ```shell
@@ -92,7 +92,7 @@ It also builds the Namada Browser extension during the startup. The chain ID is 
 You can tweak supported environment variables through the `.env` file.    
 Building cloud take a very long time to finish, so be patient, in the meantime you can work with the CLI.    
 ```shell
-docker compose up -d interface
+docker compose --profile interface up -d
 ```
 ## Using the Interface
 When the container is ready you can access the Interface in your browser, the default address is http://localhost:3000/
@@ -109,7 +109,7 @@ Click Load Unpacked and point to the `extensions/chrome` in this project
 # Tear Down
 To remove everything
 ```shell
-docker compose --profile hermes --profile interface down -v
+docker compose --profile hermes --profile interface down -v -t 0
 ```
 
 # Know Issues

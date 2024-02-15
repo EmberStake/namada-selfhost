@@ -54,6 +54,7 @@ services:
     ports:
       - "26656" # p2p
       - "26657" # http rpc
+
   interface:
     restart: unless-stopped
     profiles:
@@ -75,6 +76,7 @@ services:
       - ./extensions:/build
     ports:
       - "${INTERFACE_PORT}:3000"
+
   namada-chain-b:
     <<: *namada-common
     hostname: chain-b
@@ -90,10 +92,11 @@ services:
       - ./config/start-chain-b.sh:/docker-entrypoint-scripts.d/start-node.sh
       - namada-shared:/root/.namada-shared
       - namada-chain-b_data:/root/.local/share/namada
+
   hermes:
     image: arashidos/hermes:1.7.4-namada-long-memo
     build:
-      dockerfile: docker/bakkhermes.Dockerfile
+      dockerfile: docker/hermes.Dockerfile
       context: .
       args:
         - HERMES_TAG=${HERMES_TAG}
@@ -108,6 +111,7 @@ services:
       - ./config/hermes/start.sh:/docker-entrypoint-scripts.d/start.sh
       - namada-shared:/root/.namada-shared
       - hermes:/root/.hermes
+
 volumes:
   namada-1_data:
   namada-2_data:
