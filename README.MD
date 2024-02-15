@@ -57,7 +57,7 @@ It also builds the Namada Browser extension during the startup. The chain ID is 
 You can tweak supported environment variables through the `.env` file.    
 Building cloud take a very long time to finish, so be patient, in the meantime you can work with the CLI.    
 ```shell
-docker compose up -d interface
+docker compose --profile interface up -d
 ```
 ## Using the Interface
 When the container is ready you can access the Interface in your browser, the default address is http://localhost:3000/

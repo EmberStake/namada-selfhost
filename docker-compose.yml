@@ -55,8 +55,10 @@ services:
     ports:
       - "26656" # p2p
       - "26657" # http rpc
+
   interface:
     restart: unless-stopped
+    profiles: ["interface"]
     build:
       dockerfile: docker/namada-interface.Dockerfile
       context: .
