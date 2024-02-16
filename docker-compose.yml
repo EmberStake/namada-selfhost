@@ -24,8 +24,7 @@ services:
       - namada-shared:/root/.namada-shared
       - namada-1_data:/root/.local/share/namada
     environment:
-      # - CHAIN_ID=$CHAIN_ID
-      - P2P_PORT=${P2P_PORT}
+      - GENESIS_DELAY=${GENESIS_DELAY}
       - EXTIP=${EXTIP}
     ports:
       - "${P2P_PORT}:26656" # p2p
@@ -58,7 +57,8 @@ services:
 
   interface:
     restart: unless-stopped
-    profiles: ["interface"]
+    profiles:
+      - interface
     build:
       dockerfile: docker/namada-interface.Dockerfile
       context: .
@@ -76,12 +76,50 @@ services:
       - ./extensions:/build
     ports:
       - "${INTERFACE_PORT}:3000"
+
+  namada-chain-b:
+    <<: *namada-common
+    hostname: chain-b
+    profiles:
+      - hermes
+    environment:
+      - GENESIS_DELAY=${GENESIS_DELAY}
+      - EXTIP=${EXTIP}
+    volumes:
+      - ./config/genesis-chain-b:/genesis:ro
+      - ./config/make_balances.py:/scripts/make_balances.py
+      - ./masp-params:/root/.masp-params
+      - ./config/start-chain-b.sh:/docker-entrypoint-scripts.d/start-node.sh
+      - namada-shared:/root/.namada-shared
+      - namada-chain-b_data:/root/.local/share/namada
+
+  hermes:
+    image: arashidos/hermes:1.7.4-namada-long-memo
+    build:
+      dockerfile: docker/hermes.Dockerfile
+      context: .
+      args:
+        - HERMES_TAG=${HERMES_TAG}
+    hostname: hermes
+    profiles:
+      - hermes
+    entrypoint: ["sh", "/docker-entrypoint-scripts.d/start.sh"]
+    networks:
+      namada:
+    volumes:
+      - ./config/hermes/config-template.toml:/root/config-template.toml
+      - ./config/hermes/start.sh:/docker-entrypoint-scripts.d/start.sh
+      - namada-shared:/root/.namada-shared
+      - hermes:/root/.hermes
+
 volumes:
   namada-1_data:
   namada-2_data:
   namada-3_data:
+  namada-chain-b_data:
   namada-shared:
   namada-interface:
+  hermes:
 
 networks:
   namada:
