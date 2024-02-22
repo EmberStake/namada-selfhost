@@ -12,6 +12,13 @@ There are a bunch of [blog posts](https://mirror.xyz/0xe4e0B45aa2b06Df651337E351
 ### Requirements
 - Docker (or Docker Desktop on Windows/Mac) 
 ---
+
+# Caution!
+There is bug in version v0.31.6 for connecting to default node, for all commands that needs to connect to a node you have to explicitly pass `--node http://0.0.0.0:26657`.    
+for example : 
+```shell
+namadac balance --node http://0.0.0.0:26657
+```
 # Important!
 IF YOU ARE UPGRADING THIS PACKAGE FROM OLDER VERSIONS MAKE SURE CORRECT NAMADA VERSIONS ARE SET IN YOUR `.env` FILE.  
 you can always find the latest version supported packages in the `.env.sample` package
