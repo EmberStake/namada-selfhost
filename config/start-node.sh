@@ -40,7 +40,7 @@ if [ ! -f "/root/.namada-shared/chain.config" ]; then
     --email "$ALIAS@namada.net" \
     --path $TX_FILE_PATH \
     --unsafe-dont-encrypt
-
+  namadaw --pre-genesis add --alias "$ALIAS-validator" --value $ESTABLISHED_ACCOUNT_ADDRESS
   mkdir -p /root/.namada-shared/$ALIAS
   # these directories will be used by hermes
   mkdir -p ~/.namada-shared/chain-a && mkdir -p ~/.namada-shared/chain-b
