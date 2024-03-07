@@ -1,7 +1,7 @@
-FROM rust:1.70.0-bullseye AS builder
+FROM rust:1.76.0-bullseye AS builder
 WORKDIR /__w/namada
 # The version should be matching the version set above
-RUN rustup toolchain install 1.70.0 --profile minimal
+RUN rustup toolchain install 1.76.0 --profile minimal
 RUN rustup target add wasm32-unknown-unknown
 
 RUN apt-get update && apt-get install -y \
