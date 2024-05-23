@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
+import os
 import sys
 import toml
-import os
-import re
 
 validator_directory = sys.argv[1]
 balances_toml = sys.argv[2]
+output_toml_path = sys.argv[3]
 
 balances_config = {}
 
@@ -19,6 +19,7 @@ for subdir in os.listdir(validator_directory):
         if len(toml_files) == 1:
             toml_file_path = os.path.join(subdir_path, toml_files[0])
             transactions_toml = toml.load(toml_file_path)
+            # add a new item to balances config with this alias
             balances_config[alias] = []
             try:
                 address = transactions_toml['validator_account'][0]['address']
@@ -30,6 +31,7 @@ for subdir in os.listdir(validator_directory):
                 balances_config[alias].append(address)
             except (KeyError, IndexError) as e:
                 pass
+
 output_toml = toml.load(balances_toml)
 ACCOUNT_AMOUNT = "220000000000"
 FAUCET_AMOUNT = "9123372036854000000"
@@ -42,4 +44,8 @@ for entry in balances_config:
             else:
                 output_toml['token'][token][addr] = ACCOUNT_AMOUNT
 
-print(toml.dumps(output_toml))
+toml_content = toml.dumps(output_toml)
+# Write the TOML content to the file
+with open(output_toml_path, 'w') as file:
+    file.write(toml_content)
+print(toml_content)

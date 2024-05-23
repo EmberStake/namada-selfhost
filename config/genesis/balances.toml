@@ -1,4 +1,5 @@
 # Genesis token balances to be added here during startup
+# note that addresses will be automatically populated during the first run of containers
 
 [token.NAM]
 

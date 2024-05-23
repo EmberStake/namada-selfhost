@@ -1,4 +1,3 @@
-version: "3.8"
 x-namada: &namada-common
   restart: unless-stopped
   build:
@@ -25,7 +24,7 @@ services:
       - namada-1_data:/root/.local/share/namada
     environment:
       - GENESIS_DELAY=${GENESIS_DELAY}
-      - EXTIP=${EXTIP}
+      - EXTERNAL_IP=${EXTERNAL_IP}
     ports:
       - "${P2P_PORT}:26656" # p2p
       - "${RPC_PORT}:26657" # http rpc
@@ -84,7 +83,7 @@ services:
       - hermes
     environment:
       - GENESIS_DELAY=${GENESIS_DELAY}
-      - EXTIP=${EXTIP}
+      - EXTERNAL_IP=${EXTERNAL_IP}
     volumes:
       - ./config/genesis-chain-b:/genesis:ro
       - ./config/make_balances.py:/scripts/make_balances.py

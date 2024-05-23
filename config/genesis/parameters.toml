@@ -1,6 +1,7 @@
 # General protocol parameters.
 [parameters]
 native_token = "NAM"
+is_native_token_transferable = true
 # Minimum number of blocks in an epoch.
 min_num_of_blocks = 4
 # Maximum expected time per block (in seconds).
@@ -16,15 +17,14 @@ tx_allowlist = []
 # Implicit VP WASM name
 implicit_vp = "vp_implicit"
 # Expected number of epochs per year (also sets the min duration of an epoch in seconds)
-epochs_per_year = 31536
+# NOTE: use longer epochs for testing hermes, e.g. 31_536
+epochs_per_year = 31_536_000
 # Maximum number of signature per transaction
 max_signatures_per_transaction = 15
 # Max gas for block
 max_block_gas = 20000000
 # Fee unshielding gas limit
 fee_unshielding_gas_limit = 20000
-# Fee unshielding descriptions limit
-fee_unshielding_descriptions_limit = 15
 
 # Map of the cost per gas unit for every token allowed for fee payment
 [parameters.minimum_gas_price]
@@ -82,11 +82,13 @@ max_proposal_code_size = 600000
 # min proposal period length in epochs
 min_proposal_voting_period = 2
 # max proposal period length in epochs
-max_proposal_period = 6
+max_proposal_period = 27
 # maximum number of characters in the proposal content
 max_proposal_content_size = 10000
-# minimum epochs between end and grace epoch
+# minimum epochs between end and activation epoch
 min_proposal_grace_epochs = 2
+# maximum number of epochs between current epoch and start epoch
+max_proposal_latency = 30
 
 # Public goods funding parameters
 [pgf_params]
@@ -96,3 +98,10 @@ stewards = ["steward-1"]
 pgf_inflation_rate = "0.1"
 # The pgf stewards inflation rate
 stewards_inflation_rate = "0.01"
+
+# IBC parameters
+[ibc_params]
+# default mint limit of each token
+default_mint_limit = "0"
+# default per-epoch throughput limit of each token
+default_per_epoch_throughput_limit = "0"

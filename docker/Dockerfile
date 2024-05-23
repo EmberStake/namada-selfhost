@@ -1,12 +1,12 @@
-FROM rust:1.76.0-bullseye AS builder
+FROM rust:1.78.0-bookworm AS builder
 WORKDIR /__w/namada
 # The version should be matching the version set above
-RUN rustup toolchain install 1.76.0 --profile minimal
+RUN rustup toolchain install 1.78.0 --profile minimal
 RUN rustup target add wasm32-unknown-unknown
 
 RUN apt-get update && apt-get install -y \
     build-essential \
-    clang-tools-11 \
+    clang-tools-14 \
     git \
     libssl-dev \
     pkg-config \
@@ -32,12 +32,11 @@ WORKDIR /app
 
 RUN git clone -b v0.37.2 --single-branch https://github.com/cometbft/cometbft.git && cd cometbft && make build
 
-FROM debian:bullseye-slim AS runtime
+FROM debian:bookworm-slim AS runtime
 #ENV NAMADA_BASE_DIR=/.namada
 #ENV NAMADA_LOG_COLOR=false
 
-RUN apt-get update && apt-get install libcurl4-openssl-dev curl nano jq iproute2 procps python3 python3-pip expect -y && apt-get clean
-RUN pip install toml
+RUN apt-get update && apt-get install libcurl4-openssl-dev curl nano jq iproute2 procps python3 python3-pip python3-toml expect -y && apt-get clean
 
 COPY --from=builder /__w/namada/namada/wasm/*.wasm /__w/namada/namada/wasm/*.json /wasm/
 
