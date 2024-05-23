@@ -13,12 +13,6 @@ There are a bunch of [blog posts](https://mirror.xyz/0xe4e0B45aa2b06Df651337E351
 - Docker (or Docker Desktop on Windows/Mac) 
 ---
 
-# Caution!
-There is bug in version v0.31.6 for connecting to default node, for all commands that needs to connect to a node you have to explicitly pass `--node http://0.0.0.0:26657`.    
-for example : 
-```shell
-namadac balance --node http://0.0.0.0:26657
-```
 # Important!
 IF YOU ARE UPGRADING THIS PACKAGE FROM OLDER VERSIONS MAKE SURE CORRECT NAMADA VERSIONS ARE SET IN YOUR `.env` FILE.  
 you can always find the latest version supported packages in the `.env.sample` package
@@ -32,25 +26,25 @@ cp .env.sample .env
 Pull images from docker hub or build them from scratch.  
 To pull images do 
 ```shell
-docker compose pull
+docker compose --profile main pull
 ```
 Or, build images from the dockerfile (takes more time and requires a lot of resources) :
 
 ```shell
-docker compose build
+docker compose --profile main build
 ```
 
 # Run The Network
 
 To start the blockchain with 3 validators
 ```shell
-docker compose up -d
+docker compose --profile main up -d
 ```
 for the first time launching it give it 1-2 min to download necessary files and setup the chain. then you can use it   
 
 #### Check logs
 ```shell
-docker compose logs -f 
+docker compose --profile main logs -f 
 ```
 #### Execute commands
 exec into one of the validators , e.g.
@@ -116,7 +110,7 @@ Click Load Unpacked and point to the `extensions/chrome` in this project
 # Tear Down
 To remove everything
 ```shell
-docker compose --profile hermes --profile interface down -v -t 0
+docker compose --profile main --profile hermes --profile interface down -v -t 0
 ```
 
 # Know Issues

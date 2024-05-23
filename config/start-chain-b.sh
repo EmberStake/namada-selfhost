@@ -29,7 +29,8 @@ if [ ! -f "/root/.namada-shared/chain-b.config" ]; then
     --email "$ALIAS@namada.net" \
     --path $TX_FILE_PATH \
     --unsafe-dont-encrypt
-
+  # add `namada-x-validator` alias to wallets
+  namadaw --pre-genesis add --alias "$ALIAS-validator" --value $ESTABLISHED_ACCOUNT_ADDRESS
   mkdir -p /root/.namada-chain-b/$ALIAS
 
   # Sign validators transactions file
@@ -49,6 +50,7 @@ if [ ! -f "/root/.namada-shared/chain-b.config" ]; then
 
   # create directory for genesis toml files
   mkdir -p /root/.namada-chain-b/genesis
+  # copy genesis templates from mounted files
   cp /genesis/tokens.toml /root/.namada-chain-b/genesis/tokens.toml
   cp /genesis/validity-predicates.toml /root/.namada-chain-b/genesis/validity-predicates.toml
   cp /genesis/transactions.toml /root/.namada-chain-b/genesis/transactions.toml
@@ -57,12 +59,14 @@ if [ ! -f "/root/.namada-shared/chain-b.config" ]; then
   # add genesis transactions to transactions.toml
   cat /root/.namada-chain-b/chain-b/transactions.toml >>/root/.namada-chain-b/genesis/transactions.toml
 
-  python3 /scripts/make_balances.py /root/.namada-chain-b /genesis/balances.toml >/root/.namada-chain-b/genesis/balances.toml
+  python3 /scripts/make_balances.py /root/.namada-chain-b /genesis/balances.toml /root/.namada-chain-b/genesis/balances.toml
+
+  genesis_time=$(date -d "+${GENESIS_DELAY} seconds" +"%Y-%m-%dT%H:%M:%SZ")
 
   INIT_OUTPUT=$(namadac utils init-network \
-    --genesis-time "2023-12-11T00:00:00Z" \
+    --genesis-time "$genesis_time" \
     --wasm-checksums-path /wasm/checksums.json \
-    --chain-prefix local \
+    --chain-prefix local-b \
     --templates-path /root/.namada-chain-b/genesis \
     --consensus-timeout-commit 10s)
 
@@ -72,19 +76,19 @@ if [ ! -f "/root/.namada-shared/chain-b.config" ]; then
     awk '{print $4}')
   echo "Chain id: $CHAIN_ID"
   # write config server info to shared volume
-  printf "%b\n%b" "$PUBLIC_IP" "$CHAIN_ID" | tee /root/.namada-shared/chain-b.config
+  printf "%s\n" "$CHAIN_ID" | tee /root/.namada-shared/chain.config
 
-  export CHAIN_ID=$(awk 'NR==2' /root/.namada-shared/chain-b.config)
+
+  export CHAIN_ID=$(awk 'NR==1' /root/.namada-shared/chain.config)
   export NAMADA_NETWORK_CONFIGS_DIR=$(pwd)
-  rm -rf /root/.local/share/namada/$CHAIN_ID
   namadac utils join-network \
-    --chain-id $CHAIN_ID --genesis-validator $ALIAS --dont-prefetch-wasm
+    --chain-id $CHAIN_ID \
+    --genesis-validator $ALIAS \
+    --allow-duplicate-ip \
+    --add-persistent-peers \
+    --dont-prefetch-wasm
 
-  # copy wasm to namada dir
-  cp -a /wasm/*.wasm /root/.local/share/namada/$CHAIN_ID/wasm
-  cp -a /wasm/checksums.json /root/.local/share/namada/$CHAIN_ID/wasm
-
-  sed -i "s#external_address = \".*\"#external_address = \"$EXTIP:${P2P_PORT:-26656}\"#g" /root/.local/share/namada/$CHAIN_ID/config.toml
+  sed -i "s#external_address = \".*\"#external_address = \"$EXTERNAL_IP:${P2P_PORT:-26656}\"#g" /root/.local/share/namada/$CHAIN_ID/config.toml
 
   sed -i "s#proxy_app = \"tcp://.*:26658\"#laddr = \"tcp://0.0.0.0:26658\"#g" /root/.local/share/namada/$CHAIN_ID/config.toml
   sed -i "s#laddr = \"tcp://.*:26657\"#laddr = \"tcp://0.0.0.0:26657\"#g" /root/.local/share/namada/$CHAIN_ID/config.toml
@@ -97,7 +101,7 @@ if [ ! -f "/root/.namada-shared/chain-b.config" ]; then
   namadaw find --alias nam | grep -o 'tnam[^ ]*' >>/root/.namada-shared/chain-b-token-addrs
   namadaw find --alias eth | grep -o 'tnam[^ ]*' >>/root/.namada-shared/chain-b-token-addrs
 fi
-  export CHAIN_ID=$(awk 'NR==2' /root/.namada-shared/chain-b.config)
+  export CHAIN_ID=$(awk 'NR==1' /root/.namada-shared/chain.config)
   trap cleanup EXIT
   nohup bash -c "python3 -m http.server --directory /root/.local/share/namada/$CHAIN_ID/ 31222 &"
 # start node

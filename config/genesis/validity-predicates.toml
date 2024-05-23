@@ -8,6 +8,3 @@ filename = "vp_implicit.wasm"
 [wasm.vp_user]
 filename = "vp_user.wasm"
 
-# Token VP
-[wasm.vp_token]
-filename = "vp_token.wasm"

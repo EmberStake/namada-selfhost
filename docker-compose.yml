@@ -1,4 +1,3 @@
-version: "3.8"
 x-namada: &namada-common
   restart: unless-stopped
   build:
@@ -15,6 +14,8 @@ services:
   namada-1:
     <<: *namada-common
     hostname: namada-1
+    profiles:
+      - main
     volumes:
       - ./config/genesis:/genesis:ro
       - ./config/make_balances.py:/scripts/make_balances.py
@@ -25,7 +26,7 @@ services:
       - namada-1_data:/root/.local/share/namada
     environment:
       - GENESIS_DELAY=${GENESIS_DELAY}
-      - EXTIP=${EXTIP}
+      - EXTERNAL_IP=${EXTERNAL_IP}
     ports:
       - "${P2P_PORT}:26656" # p2p
       - "${RPC_PORT}:26657" # http rpc
@@ -34,6 +35,8 @@ services:
   namada-2:
     <<: *namada-common
     hostname: namada-2
+    profiles:
+      - main
     volumes:
       - ./masp-params:/root/.masp-params
       - ./config/start-node.sh:/docker-entrypoint-scripts.d/start-node.sh
@@ -45,6 +48,8 @@ services:
 
   namada-3:
     <<: *namada-common
+    profiles:
+      - main
     hostname: namada-3
     volumes:
       - ./masp-params:/root/.masp-params
@@ -62,6 +67,8 @@ services:
     build:
       dockerfile: docker/namada-interface.Dockerfile
       context: .
+      args:
+        - REPO_TAG=${INTERFACE_TAG}
     image: arashidos/namada-interface:${INTERFACE_TAG}
     entrypoint: [ "sh", "/docker-entrypoint-scripts.d/start-node.sh" ]
     hostname: namada-interface
@@ -84,7 +91,7 @@ services:
       - hermes
     environment:
       - GENESIS_DELAY=${GENESIS_DELAY}
-      - EXTIP=${EXTIP}
+      - EXTERNAL_IP=${EXTERNAL_IP}
     volumes:
       - ./config/genesis-chain-b:/genesis:ro
       - ./config/make_balances.py:/scripts/make_balances.py
@@ -94,7 +101,7 @@ services:
       - namada-chain-b_data:/root/.local/share/namada
 
   hermes:
-    image: arashidos/hermes:1.7.4-namada-long-memo
+    image: arashidos/hermes:${HERMES_TAG}
     build:
       dockerfile: docker/hermes.Dockerfile
       context: .

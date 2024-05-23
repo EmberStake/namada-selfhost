@@ -23,8 +23,6 @@ while true; do
         sleep 5
     fi
 done
-#export CHAIN_A_ID=$(curl -s namada-1:26657/status | jq '.result.node_info.network' | sed 's/"//g')
-#export CHAIN_B_ID=$(curl -s chain-b:26657/status | jq '.result.node_info.network' | sed 's/"//g')
 export CHAIN_A_NAM_ADDR=$(awk 'NR==1' /root/.namada-shared/tokens-addresses)
 export CHAIN_B_NAM_ADDR=$(awk 'NR==1' /root/.namada-shared/chain-b-token-addrs)
 export HERMES_CONFIG=/root/.hermes/config.toml
