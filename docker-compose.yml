@@ -116,6 +116,7 @@ services:
     volumes:
       - ./config/hermes/config-template.toml:/root/config-template.toml
       - ./config/hermes/start.sh:/docker-entrypoint-scripts.d/start.sh
+      - ./masp-params:/root/.masp-params
       - namada-shared:/root/.namada-shared
       - hermes:/root/.hermes
 

@@ -18,7 +18,7 @@ tx_allowlist = []
 implicit_vp = "vp_implicit"
 # Expected number of epochs per year (also sets the min duration of an epoch in seconds)
 # NOTE: use longer epochs for testing hermes, e.g. 31_536
-epochs_per_year = 31_536_000
+epochs_per_year = 31_536
 # Maximum number of signature per transaction
 max_signatures_per_transaction = 15
 # Max gas for block
@@ -102,6 +102,6 @@ stewards_inflation_rate = "0.01"
 # IBC parameters
 [ibc_params]
 # default mint limit of each token
-default_mint_limit = "0"
+default_mint_limit = "10000000"
 # default per-epoch throughput limit of each token
-default_per_epoch_throughput_limit = "0"
+default_per_epoch_throughput_limit = "10000000"
