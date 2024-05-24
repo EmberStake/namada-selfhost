@@ -3,19 +3,14 @@ This repository helps to quickly spin up a local version of namada blockchain an
 Including : 
 - A Namada blockchain with 3 validators
 - Hermes for IBC transfer (by running a second namada blockchain called chain-b)
-- Namada interface clone on localhost
-- Namada extension with your local chain configs   
 
-This can be helpful for curios users and developers alike.   
-There are a bunch of [blog posts](https://mirror.xyz/0xe4e0B45aa2b06Df651337E3519ee6ccD81511Bf0/V8GPGi3XTf1WcL0nB2oGKo1T6X1cHfzfQCpj11tuUPI) with detailed instruction on how to install and work with this code
 
 ### Requirements
 - Docker (or Docker Desktop on Windows/Mac) 
 ---
 
 # Important!
-IF YOU ARE UPGRADING THIS PACKAGE FROM OLDER VERSIONS MAKE SURE CORRECT NAMADA VERSIONS ARE SET IN YOUR `.env` FILE.  
-you can always find the latest version supported packages in the `.env.sample` package
+IF YOU ARE UPGRADING THIS PACKAGE FROM OLDER VERSIONS IT IS RECOMMENDED TO REMOVE YOUR OLD `.env` FILE
 
 ## Initialize settings
 
@@ -66,9 +61,23 @@ for more information about commands, check the [official docs](https://docs.nama
 # Hermes and IBC transfers
 To test hermes on a Namada <> Namada channel , we need another instance of namada blockchain. this is included under hermes profile in docker compose file.   
 To run chain B and the hermes container    
+
+Pull images from docker hub or build them from scratch.  
+To pull images do
+```shell
+docker compose --profile hermes pull
+```
+Or, build images from the dockerfile (takes more time and requires a lot of resources) :
+
+```shell
+docker compose --profile hermes build
+```
+
+Then run the hermes containers
 ```shell
 docker compose --profile hermes up -d
 ```
+
 this will create chain-b , another namada blockchain with single validator and sets configs on the hermes and create a channel between two blockchains.   
 Hermes takes some time to be functional, so the check logs before start using it 
 ```shell
@@ -86,33 +95,8 @@ namadac ibc-transfer --amount 5 --source namada-1-wallet --receiver <ADDRESS_WAL
 ```
 get back into chain-b terminal, after a short time query the balance of your wallet and you should see tokens have arrived
 
-# Namada Interface & Extension
-
-This stack comes with a container named `interface` which serves the [official namada-interface](https://github.com/anoma/namada-interface)
-It also builds the Namada Browser extension during the startup. The chain ID is automatically set to the local running Namada blockchain.    
-You can tweak supported environment variables through the `.env` file.    
-Building cloud take a very long time to finish, so be patient, in the meantime you can work with the CLI.    
-```shell
-docker compose --profile interface up -d
-```
-## Using the Interface
-When the container is ready you can access the Interface in your browser, the default address is http://localhost:3000/
-
-## Using The Extension
-The extension files are accessible in `extensions` directory. to install the chrome wallet extension do the following :    
-
-In Chrome, select Manage Extensions    
-Click the toggle to enable Developer Mode    
-Click Load Unpacked and point to the `extensions/chrome` in this project    
-
-**Important** The extension should be reinstalled if you rebuild your CHAIN_ID changes    
-
 # Tear Down
 To remove everything
 ```shell
-docker compose --profile main --profile hermes --profile interface down -v -t 0
+docker compose --profile main --profile hermes down -v -t 0
 ```
-
-# Know Issues
-- The UI does not show correct Account balances
-- Interface Docker image size is very large and it's build time takes ages
