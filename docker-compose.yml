@@ -4,9 +4,9 @@ x-namada: &namada-common
     dockerfile: docker/Dockerfile
     context: .
     args:
-      - NAMADA_TAG=${NAMADA_TAG}
+      - NAMADA_TAG=${NAMADA_TAG:-v0.37.0}
       - BUILD_WASM=true
-  image: arashidos/namada:${NAMADA_TAG}
+  image: arashidos/namada:${NAMADA_TAG:-v0.37.0}
   entrypoint: ["sh", "/docker-entrypoint-scripts.d/start-node.sh"]
   networks:
     namada:
@@ -60,30 +60,6 @@ services:
       - "26656" # p2p
       - "26657" # http rpc
 
-  interface:
-    restart: unless-stopped
-    profiles:
-      - interface
-    build:
-      dockerfile: docker/namada-interface.Dockerfile
-      context: .
-      args:
-        - REPO_TAG=${INTERFACE_TAG}
-    image: arashidos/namada-interface:${INTERFACE_TAG}
-    entrypoint: [ "sh", "/docker-entrypoint-scripts.d/start-node.sh" ]
-    hostname: namada-interface
-    env_file:
-      - .env
-    networks:
-      namada:
-    volumes:
-      - ./config/namada-interface-entrypoint.sh:/docker-entrypoint-scripts.d/start-node.sh
-      - namada-shared:/root/.namada-shared
-      - namada-interface:/root/.local/share/namada
-      - ./extensions:/build
-    ports:
-      - "${INTERFACE_PORT}:3000"
-
   namada-chain-b:
     <<: *namada-common
     hostname: chain-b
@@ -101,12 +77,12 @@ services:
       - namada-chain-b_data:/root/.local/share/namada
 
   hermes:
-    image: arashidos/hermes:${HERMES_TAG}
+    image: arashidos/hermes:${HERMES_TAG:-v1.8.2-namada-beta10}
     build:
       dockerfile: docker/hermes.Dockerfile
       context: .
       args:
-        - HERMES_TAG=${HERMES_TAG}
+        - HERMES_TAG=${HERMES_TAG:-v1.8.2-namada-beta10}
     hostname: hermes
     profiles:
       - hermes
@@ -116,6 +92,7 @@ services:
     volumes:
       - ./config/hermes/config-template.toml:/root/config-template.toml
       - ./config/hermes/start.sh:/docker-entrypoint-scripts.d/start.sh
+      - ./masp-params:/root/.masp-params
       - namada-shared:/root/.namada-shared
       - hermes:/root/.hermes
 
@@ -125,7 +102,6 @@ volumes:
   namada-3_data:
   namada-chain-b_data:
   namada-shared:
-  namada-interface:
   hermes:
 
 networks:

@@ -76,10 +76,10 @@ if [ ! -f "/root/.namada-shared/chain-b.config" ]; then
     awk '{print $4}')
   echo "Chain id: $CHAIN_ID"
   # write config server info to shared volume
-  printf "%s\n" "$CHAIN_ID" | tee /root/.namada-shared/chain.config
+  printf "%s\n" "$CHAIN_ID" | tee /root/.namada-shared/chain-b.config
 
 
-  export CHAIN_ID=$(awk 'NR==1' /root/.namada-shared/chain.config)
+  export CHAIN_ID=$(awk 'NR==1' /root/.namada-shared/chain-b.config)
   export NAMADA_NETWORK_CONFIGS_DIR=$(pwd)
   namadac utils join-network \
     --chain-id $CHAIN_ID \
@@ -101,7 +101,7 @@ if [ ! -f "/root/.namada-shared/chain-b.config" ]; then
   namadaw find --alias nam | grep -o 'tnam[^ ]*' >>/root/.namada-shared/chain-b-token-addrs
   namadaw find --alias eth | grep -o 'tnam[^ ]*' >>/root/.namada-shared/chain-b-token-addrs
 fi
-  export CHAIN_ID=$(awk 'NR==1' /root/.namada-shared/chain.config)
+  export CHAIN_ID=$(awk 'NR==1' /root/.namada-shared/chain-b.config)
   trap cleanup EXIT
   nohup bash -c "python3 -m http.server --directory /root/.local/share/namada/$CHAIN_ID/ 31222 &"
 # start node

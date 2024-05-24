@@ -13,4 +13,3 @@ toml_content = toml.dumps(params_toml)
 # Write the TOML content to the file
 with open(output_toml_path, 'w') as file:
     file.write(toml_content)
-print(toml_content)
