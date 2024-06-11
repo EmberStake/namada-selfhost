@@ -4,9 +4,9 @@ x-namada: &namada-common
     dockerfile: docker/Dockerfile
     context: .
     args:
-      - NAMADA_TAG=${NAMADA_TAG:-v0.38.1}
+      - NAMADA_TAG=${NAMADA_TAG:-v0.39.0}
       - BUILD_WASM=true
-  image: arashidos/namada:${NAMADA_TAG:-v0.38.1}
+  image: arashidos/namada:${NAMADA_TAG:-v0.39.0}
   entrypoint: ["sh", "/docker-entrypoint-scripts.d/start-node.sh"]
   networks:
     namada:
