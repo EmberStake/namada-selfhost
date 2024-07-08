@@ -61,8 +61,7 @@ if [ ! -f "/root/.namada-shared/chain-b.config" ]; then
 
   python3 /scripts/make_balances.py /root/.namada-chain-b /genesis/balances.toml /root/.namada-chain-b/genesis/balances.toml
 
-  genesis_time=$(date -d "+${GENESIS_DELAY} seconds" +"%Y-%m-%dT%H:%M:%SZ")
-
+  genesis_time=$(date -d "+${GENESIS_DELAY} seconds" +"%Y-%m-%dT%H:%M:%S.%N+00:00")
   INIT_OUTPUT=$(namadac utils init-network \
     --genesis-time "$genesis_time" \
     --wasm-checksums-path /wasm/checksums.json \
