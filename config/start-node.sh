@@ -62,7 +62,7 @@ generate_chain_configs() {
       python3 /scripts/update_params.py /genesis/parameters.toml "$STEWARD_TNAM" /root/.namada-shared/genesis/parameters.toml
 
 
-      genesis_time=$(date -d "+${GENESIS_DELAY} seconds" +"%Y-%m-%dT%H:%M:%SZ")
+      genesis_time=$(date -d "+${GENESIS_DELAY} seconds" +"%Y-%m-%dT%H:%M:%S.%N+00:00")
 
       INIT_OUTPUT=$(namadac utils init-network \
         --genesis-time "$genesis_time" \
