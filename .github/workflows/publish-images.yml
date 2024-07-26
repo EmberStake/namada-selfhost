@@ -29,7 +29,7 @@ jobs:
       - name: Docker Compose Build & Push
         uses: 0x4r45h/docker-compose-ci@v0.1.1
         with:
-          services: 'main'
+          services: 'namada-1'
   build-hermes:
     runs-on: ubuntu-latest
     permissions:
