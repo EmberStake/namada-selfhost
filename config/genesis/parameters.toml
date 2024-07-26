@@ -6,7 +6,7 @@ is_native_token_transferable = true
 min_num_of_blocks = 4
 # Max payload size, in bytes, for a tx.
 max_tx_bytes = 1048576
-# Max payload size, in bytes, for a tx batch proposal.
+# Max payload size, in bytes, for a block proposal.
 max_proposal_bytes = 6291456
 # vp allowlist
 vp_allowlist = []
@@ -22,9 +22,9 @@ masp_epoch_multiplier = 2
 # Max gas for block
 max_block_gas = 20000000
 # Masp fee payment gas limit
-masp_fee_payment_gas_limit = 20000
+masp_fee_payment_gas_limit = 150_000
 # Gas scale
-gas_scale = 100_000_000
+gas_scale = 10_000_000
 # Fee unshielding gas limit
 fee_unshielding_gas_limit = 20000
 
