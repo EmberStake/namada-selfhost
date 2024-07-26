@@ -27,14 +27,15 @@ RUN git checkout ${NAMADA_TAG}
 RUN make build-release
 RUN make build-wasm-scripts
 
-FROM golang:1.18.0 as tendermint-builder
+FROM golang:1.19.0 as tendermint-builder
 WORKDIR /app
 
-RUN git clone -b v0.37.2 --single-branch https://github.com/cometbft/cometbft.git && cd cometbft && make build
+RUN git clone https://github.com/cometbft/cometbft.git
+WORKDIR cometbft
+RUN git checkout v0.37.9
+RUN make build
 
 FROM debian:bookworm-slim AS runtime
-#ENV NAMADA_BASE_DIR=/.namada
-#ENV NAMADA_LOG_COLOR=false
 
 RUN apt-get update && apt-get install libcurl4-openssl-dev curl nano jq iproute2 procps python3 python3-pip python3-toml expect -y && apt-get clean
 
