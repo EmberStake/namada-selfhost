@@ -28,17 +28,8 @@ generate_chain_configs() {
       STEWARD_ESTABLISHED=$(namadac utils init-genesis-established-account --path /root/.namada-shared/$STEWARD_ALIAS/transactions.toml --aliases $STEWARD_ALIAS)
       STEWARD_TNAM=$(echo "$STEWARD_ESTABLISHED" | grep -o 'tnam[[:alnum:]]*')
 
-      # create a faucet account
-      FAUCET_ALIAS="faucet-1"
-      namadaw --pre-genesis gen --alias $FAUCET_ALIAS --unsafe-dont-encrypt
-      mkdir /root/.namada-shared/$FAUCET_ALIAS
-      namadac utils init-genesis-established-account --path /root/.namada-shared/$FAUCET_ALIAS/transactions.toml --aliases $FAUCET_ALIAS
-
-      # create a relayer account
-      RELAYER_ALIAS="relayer"
-      namadaw --pre-genesis gen --alias $RELAYER_ALIAS --unsafe-dont-encrypt
-      mkdir /root/.namada-shared/$RELAYER_ALIAS
-      namadac utils init-genesis-established-account --path /root/.namada-shared/$RELAYER_ALIAS/transactions.toml --aliases $RELAYER_ALIAS
+      namadaw --pre-genesis gen --alias faucet-1 --unsafe-dont-encrypt
+      namadaw --pre-genesis gen --alias relayer --unsafe-dont-encrypt
 
       # create directory for genesis toml files
       mkdir -p /root/.namada-shared/genesis
@@ -49,14 +40,21 @@ generate_chain_configs() {
 
       # make a copy of wallet to namada folder for convenience (access to faucet account keys)
       cp -a /root/.local/share/namada/pre-genesis/wallet.toml /root/.local/share/namada/wallet.toml
+
+      # Store all tnam addresses in a file  to fund them
+      namadaw --pre-genesis list --addr > temp_output.txt
+      echo "{" > /root/.namada-shared/namada_addresses.json
+      grep -E '^  ".*":' temp_output.txt | sed 's/^  "\(.*\)": .*: \(.*\)$/  "\1": "\2",/' >> /root/.namada-shared/namada_addresses.json
+      sed -i '$ s/,$//' /root/.namada-shared/namada_addresses.json  # Remove the trailing comma
+      echo "}" >> /root/.namada-shared/namada_addresses.json
+      rm temp_output.txt
+
       # add all signed genesis transactions to a final transactions.toml
       # TODO: move to python script
       cat /root/.namada-shared/namada-1/transactions.toml >>/root/.namada-shared/genesis/transactions.toml
       cat /root/.namada-shared/namada-2/transactions.toml >>/root/.namada-shared/genesis/transactions.toml
       cat /root/.namada-shared/namada-3/transactions.toml >>/root/.namada-shared/genesis/transactions.toml
       cat /root/.namada-shared/$STEWARD_ALIAS/transactions.toml >>/root/.namada-shared/genesis/transactions.toml
-      cat /root/.namada-shared/$FAUCET_ALIAS/transactions.toml >>/root/.namada-shared/genesis/transactions.toml
-      cat /root/.namada-shared/$RELAYER_ALIAS/transactions.toml >>/root/.namada-shared/genesis/transactions.toml
 
       python3 /scripts/make_balances.py /root/.namada-shared /genesis/balances.toml /root/.namada-shared/genesis/balances.toml
       python3 /scripts/update_params.py /genesis/parameters.toml "$STEWARD_TNAM" /root/.namada-shared/genesis/parameters.toml
@@ -162,8 +160,7 @@ namadac utils join-network \
   --chain-id $CHAIN_ID \
   --genesis-validator $ALIAS \
   --allow-duplicate-ip \
-  --add-persistent-peers \
-  --dont-prefetch-wasm
+  --add-persistent-peers
 
 sed -i "s#proxy_app = \"tcp://.*:26658\"#laddr = \"tcp://0.0.0.0:26658\"#g" /root/.local/share/namada/$CHAIN_ID/config.toml
 sed -i "s#laddr = \"tcp://.*:26657\"#laddr = \"tcp://0.0.0.0:26657\"#g" /root/.local/share/namada/$CHAIN_ID/config.toml

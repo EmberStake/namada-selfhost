@@ -53,9 +53,14 @@ namada --version
 each container has a wallet funded with tokens, you can make tx from this wallet or fund new wallets, for example on validator 1 container
 ```shell
 docker compose exec namada-1 bash
-namadac balance --owner namada-1-wallet
+namadac balance --owner namada-1-wallet --token nam
 ```
+there is also a faucet account with huge amounts of NAM on container `namada-1`, you can use it to transfer funds to other accounts:
 
+```bash
+docker compose exec namada-1 bash
+namadac transparent-transfer  --source faucet-1 --target namada-1-wallet --amount 200000 --token nam
+```
 for more information about commands, check the [official docs](https://docs.namada.net/users)
 
 # Hermes and IBC transfers
@@ -85,7 +90,7 @@ docker compose logs -f hermes
 ```
 now exec into chain-b and get an address wallet from there
 ```shell
-docker compose exec chain-b bash
+docker compose exec namada-chain-b bash
 namadaw list
 ```
 in another terminal exec into namada-1 and transfer any tokens to chain-b

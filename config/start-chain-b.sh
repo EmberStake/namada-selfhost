@@ -59,6 +59,14 @@ if [ ! -f "/root/.namada-shared/chain-b.config" ]; then
   # add genesis transactions to transactions.toml
   cat /root/.namada-chain-b/chain-b/transactions.toml >>/root/.namada-chain-b/genesis/transactions.toml
 
+  # Store all tnam addresses in a file  to fund them
+  namadaw --pre-genesis list --addr > /root/.namada-chain-b/temp_output.txt
+  echo "{" > /root/.namada-chain-b/namada_addresses.json
+  grep -E '^  ".*":' /root/.namada-chain-b/temp_output.txt | sed 's/^  "\(.*\)": .*: \(.*\)$/  "\1": "\2",/' >> /root/.namada-chain-b/namada_addresses.json
+  sed -i '$ s/,$//' /root/.namada-chain-b/namada_addresses.json  # Remove the trailing comma
+  echo "}" >> /root/.namada-chain-b/namada_addresses.json
+  rm temp_output.txt
+
   python3 /scripts/make_balances.py /root/.namada-chain-b /genesis/balances.toml /root/.namada-chain-b/genesis/balances.toml
 
   genesis_time=$(date -d "+${GENESIS_DELAY} seconds" +"%Y-%m-%dT%H:%M:%S.%N+00:00")
@@ -84,8 +92,7 @@ if [ ! -f "/root/.namada-shared/chain-b.config" ]; then
     --chain-id $CHAIN_ID \
     --genesis-validator $ALIAS \
     --allow-duplicate-ip \
-    --add-persistent-peers \
-    --dont-prefetch-wasm
+    --add-persistent-peers
 
   sed -i "s#external_address = \".*\"#external_address = \"$EXTERNAL_IP:${P2P_PORT:-26656}\"#g" /root/.local/share/namada/$CHAIN_ID/config.toml
 

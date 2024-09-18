@@ -27,7 +27,7 @@ RUN git checkout ${NAMADA_TAG}
 RUN make build-release
 RUN make build-wasm-scripts
 
-FROM golang:1.19.0 as tendermint-builder
+FROM golang:1.21.0 as tendermint-builder
 WORKDIR /app
 
 RUN git clone https://github.com/cometbft/cometbft.git
