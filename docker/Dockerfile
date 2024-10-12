@@ -1,4 +1,4 @@
-FROM rust:1.78.0-bookworm AS builder
+FROM rust:1.81.0-bookworm AS builder
 WORKDIR /__w/namada
 # The version should be matching the version set above
 RUN rustup toolchain install 1.78.0 --profile minimal
@@ -32,7 +32,7 @@ WORKDIR /app
 
 RUN git clone https://github.com/cometbft/cometbft.git
 WORKDIR cometbft
-RUN git checkout v0.37.9
+RUN git checkout v0.37.11
 RUN make build
 
 FROM debian:bookworm-slim AS runtime
