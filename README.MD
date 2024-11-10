@@ -50,12 +50,8 @@ then you can run any commands over the blockchain. e.g. :
 ```shell
 namada --version
 ```
-each container has a wallet funded with tokens, you can make tx from this wallet or fund new wallets, for example on validator 1 container
-```shell
-docker compose exec namada-1 bash
-namadac balance --owner namada-1-wallet --token nam
-```
-there is also a faucet account with huge amounts of NAM on container `namada-1`, you can use it to transfer funds to other accounts:
+
+there is a faucet account with huge amounts of NAM on container `namada-1`, you can use it to transfer funds to other accounts:
 
 ```bash
 docker compose exec namada-1 bash

@@ -1,7 +1,7 @@
 FROM rust:1.81.0-bookworm AS builder
 WORKDIR /__w/namada
 # The version should be matching the version set above
-RUN rustup toolchain install 1.78.0 --profile minimal
+RUN rustup toolchain install 1.81.0 --profile minimal
 RUN rustup target add wasm32-unknown-unknown
 
 RUN apt-get update && apt-get install -y \
@@ -37,7 +37,7 @@ RUN make build
 
 FROM debian:bookworm-slim AS runtime
 
-RUN apt-get update && apt-get install libcurl4-openssl-dev curl nano jq iproute2 procps python3 python3-pip python3-toml expect -y && apt-get clean
+RUN apt-get update && apt-get install libcurl4-openssl-dev curl nano jq iproute2 procps python3 python3-pip python3-toml bash-completion -y && apt-get clean
 
 COPY --from=builder /__w/namada/namada/wasm/*.wasm /__w/namada/namada/wasm/*.json /wasm/
 
@@ -46,6 +46,10 @@ COPY --from=builder /__w/namada/namada/target/release/namadan /usr/local/bin
 COPY --from=builder /__w/namada/namada/target/release/namadaw /usr/local/bin
 COPY --from=builder /__w/namada/namada/target/release/namadac /usr/local/bin
 COPY --from=tendermint-builder /app/cometbft/build/cometbft /usr/local/bin
+
+# Set up bash completion for Namada
+RUN namada complete --shell bash > /usr/share/bash-completion/completions/namada.bash
+RUN echo 'if ! shopt -oq posix; then\n  if [ -f /usr/share/bash-completion/bash_completion ]; then\n    . /usr/share/bash-completion/bash_completion\n  fi\nfi' >> /etc/bash.bashrc
 
 EXPOSE 26656
 EXPOSE 26660

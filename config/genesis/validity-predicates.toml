@@ -7,4 +7,3 @@ filename = "vp_implicit.wasm"
 # Default user VP in established accounts
 [wasm.vp_user]
 filename = "vp_user.wasm"
-
