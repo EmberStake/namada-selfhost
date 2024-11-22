@@ -4,9 +4,9 @@ x-namada: &namada-common
     dockerfile: docker/Dockerfile
     context: .
     args:
-      - NAMADA_TAG=${NAMADA_TAG:-v0.45.1}
+      - NAMADA_TAG=${NAMADA_TAG:-v0.46.0}
       - BUILD_WASM=true
-  image: ghcr.io/emberstake/namada-selfhost/namada:${NAMADA_TAG:-v0.45.1}
+  image: ghcr.io/emberstake/namada-selfhost/namada:${NAMADA_TAG:-v0.46.0}
   entrypoint: ["sh", "/docker-entrypoint-scripts.d/start-node.sh"]
   extra_hosts:
     - "host.docker.internal:host-gateway"
@@ -79,12 +79,12 @@ services:
       - namada-chain-b_data:/root/.local/share/namada
 
   hermes:
-    image: ghcr.io/emberstake/namada-selfhost/hermes:${HERMES_TAG:-v1.10.0-namada-beta15-rc2}
+    image: ghcr.io/emberstake/namada-selfhost/hermes:${HERMES_TAG:-v1.10.4-namada-beta17-rc2}
     build:
       dockerfile: docker/hermes.Dockerfile
       context: .
       args:
-        - HERMES_TAG=${HERMES_TAG:-v1.10.0-namada-beta15-rc2}
+        - HERMES_TAG=${HERMES_TAG:-v1.10.4-namada-beta17-rc2}
     hostname: hermes
     profiles:
       - hermes
