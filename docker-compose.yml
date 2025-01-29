@@ -4,9 +4,9 @@ x-namada: &namada-common
     dockerfile: docker/Dockerfile
     context: .
     args:
-      - NAMADA_TAG=${NAMADA_TAG:-v1.0.0}
+      - NAMADA_TAG=${NAMADA_TAG:-v1.1.0}
       - BUILD_WASM=true
-  image: ghcr.io/emberstake/namada-selfhost/namada:${NAMADA_TAG:-v1.0.0}
+  image: ghcr.io/emberstake/namada-selfhost/namada:${NAMADA_TAG:-v1.1.0}
   entrypoint: ["sh", "/docker-entrypoint-scripts.d/start-node.sh"]
   extra_hosts:
     - "host.docker.internal:host-gateway"
