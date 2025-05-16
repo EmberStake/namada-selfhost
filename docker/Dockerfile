@@ -1,7 +1,7 @@
-FROM rust:1.81.0-bookworm AS builder
+FROM rust:1.85.1-bookworm AS builder
 WORKDIR /__w/namada
 # The version should be matching the version set above
-RUN rustup toolchain install 1.81.0 --profile minimal
+RUN rustup toolchain install 1.85.1 --profile minimal
 RUN rustup target add wasm32-unknown-unknown
 
 RUN apt-get update && apt-get install -y \
@@ -27,12 +27,11 @@ RUN git checkout ${NAMADA_TAG}
 RUN make build-release
 RUN make build-wasm-scripts
 
-FROM golang:1.21.0 as tendermint-builder
+FROM golang:1.23-bookworm AS cometbft-builder
 WORKDIR /app
 
-RUN git clone https://github.com/cometbft/cometbft.git
+RUN git clone -b v0.37.15 https://github.com/cometbft/cometbft.git
 WORKDIR cometbft
-RUN git checkout v0.37.11
 RUN make build
 
 FROM debian:bookworm-slim AS runtime
@@ -45,7 +44,7 @@ COPY --from=builder /__w/namada/namada/target/release/namada /usr/local/bin
 COPY --from=builder /__w/namada/namada/target/release/namadan /usr/local/bin
 COPY --from=builder /__w/namada/namada/target/release/namadaw /usr/local/bin
 COPY --from=builder /__w/namada/namada/target/release/namadac /usr/local/bin
-COPY --from=tendermint-builder /app/cometbft/build/cometbft /usr/local/bin
+COPY --from=cometbft-builder /app/cometbft/build/cometbft /usr/local/bin
 
 # Set up bash completion for Namada
 RUN namada complete --shell bash > /usr/share/bash-completion/completions/namada.bash
