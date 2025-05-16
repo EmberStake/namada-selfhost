@@ -1,30 +1,12 @@
-FROM rust:1.81.0-bookworm AS builder
+FROM debian:trixie-slim AS runtime
 ARG HERMES_TAG
-ARG HERMES_ARCH="x86_64-unknown-linux-gnu"
-WORKDIR /root
-# The version should be matching the version set above
-RUN rustup toolchain install 1.81.0 --profile minimal
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    clang-tools-14 \
-    git \
-    libssl-dev \
-    pkg-config \
-    protobuf-compiler \
-    libudev-dev \
-    && apt-get clean
+RUN apt-get update && apt-get install unzip wget libcurl4-openssl-dev curl nano jq iproute2 procps bash-completion -y && apt-get clean
 
-RUN git clone https://github.com/heliaxdev/hermes.git
-WORKDIR /root/hermes
-RUN git checkout ${HERMES_TAG}
-
-RUN cargo build --release --bin hermes
-
-FROM debian:bookworm-slim AS runtime
-
-RUN apt-get update && apt-get install libcurl4-openssl-dev curl nano jq iproute2 procps bash-completion -y && apt-get clean
-
-COPY --from=builder /root/hermes/target/release/hermes /usr/local/bin/
+RUN wget https://github.com/informalsystems/hermes/releases/download/${HERMES_TAG}/hermes-${HERMES_TAG}-x86_64-unknown-linux-gnu.zip -O /tmp/hermes.zip && \
+    unzip /tmp/hermes.zip -d /tmp && \
+    mv /tmp/hermes /usr/local/bin/ && \
+    rm -rf /tmp/hermes* && \
+    chmod +x /usr/local/bin/hermes
 
 # Set up bash completion
 RUN hermes completions --shell bash > /usr/share/bash-completion/completions/hermes.bash
